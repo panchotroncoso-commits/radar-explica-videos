@@ -24,7 +24,7 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$RADAR_REPO_KEY" | sed 's/\\n/\n/g' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -q github.com >> ~/.ssh/known_hosts
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
       - run: python publicar.py
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
