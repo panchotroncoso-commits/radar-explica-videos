@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Explica · tablero · 2026-10-30</title>
+<meta name="description" content="Tablero de Radar Explica: lo que está subiendo hoy en CL, MX, AR, CO, PE, resultados, aprendizaje y meta del mes.">
+<meta name="theme-color" content="#0B0614">
+<style>/* Radar Explica — tokens de diseño. Fuente única de verdad para la web y cualquier interfaz.
+   Ver DISENO.md para el uso. */
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap");
+
+:root {
+  color-scheme: dark;
+
+  /* Base */
+  --noche: #0B0614;
+  --superficie: #17102A;
+  --borde: #2A1A45;
+  --texto: #FFFFFF;
+  --lavanda: #C9B8E8;
+
+  /* Escala térmica continua (frío → ardiendo) */
+  --calor-0: #140826;
+  --calor-1: #220C45;
+  --calor-2: #3B0F70;
+  --calor-3: #8C2981;
+  --calor-4: #DE4968;
+  --calor-5: #FE9F6D;
+  --calor-6: #FCFDBF;
+
+  /* Escala de atención (estados) */
+  --frio: var(--calor-2);
+  --tibio: var(--calor-3);
+  --subiendo: var(--calor-4);
+  --caliente: var(--calor-5);
+  --ardiendo: var(--calor-6);
+
+  /* Series */
+  --serie-tema: var(--calor-6);
+  --serie-efemeride: var(--calor-3);
+  --serie-semana: var(--calor-4);
+
+  /* Tipografía */
+  --fuente-titulo: "Sora", "Helvetica Neue", Arial, sans-serif;
+  --fuente-texto: "Sora", "Helvetica Neue", Arial, sans-serif;
+  --fuente-dato: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --interletra-titulo: -0.04em;
+
+  /* Casillas del mapa de calor */
+  --casilla-espacio: 18%;
+  --casilla-radio: 6px;
+  --radio-chip: 8px;
+  --radio-panel: 16px;
+}
+
+body {
+  background: var(--noche);
+  color: var(--texto);
+  font-family: var(--fuente-texto);
+}
+
+.chip {
+  display: inline-block;
+  font-family: var(--fuente-titulo);
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: var(--radio-chip);
+  padding: 0.35em 0.7em;
+}
+.chip--frio, .chip--tibio, .chip--subiendo { color: var(--texto); }
+.chip--caliente, .chip--ardiendo { color: var(--noche); }
+.chip--frio { background: var(--frio); }
+.chip--tibio { background: var(--tibio); }
+.chip--subiendo { background: var(--subiendo); }
+.chip--caliente { background: var(--caliente); }
+.chip--ardiendo { background: var(--ardiendo); }
+
+.dato {
+  font-family: var(--fuente-dato);
+  font-weight: 500;
+  color: var(--caliente);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--noche, #0B0614); color: var(--texto, #FFFFFF); font-family: var(--fuente-texto); line-height: 1.45; }
+a { color: inherit; }
+code { font-family: var(--fuente-dato); font-size: .92em; color: var(--lavanda); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pagina { max-width: 860px; margin: 0 auto; padding: 16px 16px 48px; }
+header.cab { display: flex; align-items: center; gap: 12px; padding: 4px 0 12px; }
+header.cab .re { flex: none; border-radius: 6px; }
+header.cab .marca { white-space: nowrap; font-weight: 800; letter-spacing: var(--interletra-titulo); font-size: 18px; text-decoration: none; }
+header.cab .nav { margin-left: auto; display: flex; gap: 6px; font-family: var(--fuente-dato); font-size: 11px; white-space: nowrap; }
+header.cab .nav a { color: var(--lavanda); text-decoration: none; padding: 0 8px; border: 1px solid var(--borde); border-radius: var(--radio-chip); min-height: 34px; display: inline-flex; align-items: center; }
+header.cab .nav a:hover { color: var(--texto); border-color: var(--lavanda); }
+header.cab .nav .off { opacity: .35; pointer-events: none; }
+.pestanas { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 2px 0 10px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; scrollbar-width: none; position: sticky; top: 0; background: var(--noche); z-index: 2; }
+.pestanas::-webkit-scrollbar { display: none; }
+.pestanas button { flex: none; font: 800 12px/1 var(--fuente-titulo); letter-spacing: -0.01em; text-transform: uppercase; color: var(--lavanda); background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio-chip); min-height: 44px; padding: 0 14px; cursor: pointer; }
+.pestanas button[aria-selected="true"] { color: var(--noche); background: var(--ardiendo); border-color: var(--ardiendo); }
+.pestanas button .cuenta { font-family: var(--fuente-dato); font-weight: 500; opacity: .8; margin-left: 6px; }
+.panel { display: none; }
+.panel[data-activa] { display: block; }
+h1 { font-size: 26px; line-height: 1.1; letter-spacing: var(--interletra-titulo); margin: 8px 0 6px; font-weight: 800; }
+h1 small { display: block; font-weight: 400; font-size: 15px; color: var(--lavanda); letter-spacing: 0; margin-top: 6px; }
+.dato { color: var(--caliente); font-family: var(--fuente-dato); font-weight: 500; }
+.sin { font-family: var(--fuente-dato); font-size: 11px; color: var(--lavanda); opacity: .7; }
+.actualizado { font-family: var(--fuente-dato); font-size: 12px; color: var(--lavanda); margin: 0 0 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.ancho { display: none; }
+.pagina { overflow-x: clip; }
+.mapa { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 0 0 12px; }
+.mapa .casilla { aspect-ratio: 1; min-height: 44px; border-radius: var(--casilla-radio); display: block; transition: transform .15s; position: relative; }
+.mapa .casilla:hover, .mapa .casilla:focus-visible { transform: scale(1.08); outline: 2px solid var(--texto); outline-offset: 2px; }
+.casilla__marca { position: absolute; inset: 0; border-radius: inherit; border: 3px solid var(--texto); }
+.leyenda { font-family: var(--fuente-dato); font-size: 11px; color: var(--lavanda); margin: 0 0 18px; display: flex; gap: 10px; align-items: center; }
+.barra-leyenda { flex: 1; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #140826, #220C45, #3B0F70, #8C2981, #DE4968, #FE9F6D, #FCFDBF); }
+.leyenda__marca i { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--texto); border-radius: 3px; vertical-align: -2px; margin-right: 4px; }
+.resumen { background: var(--superficie); border-radius: var(--radio-panel); padding: 12px 14px; font-size: 14px; color: var(--lavanda); margin: 0 0 16px; }
+.resumen b { color: var(--texto); font-weight: 600; }
+.resumen .par { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.resumen .par .chip { font-size: 10px; }
+.resumen .cifras { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--fuente-dato); font-size: 12px; margin-top: 8px; }
+.resumen .fuente { display: block; font-family: var(--fuente-dato); font-size: 11px; margin-top: 8px; opacity: .8; }
+.elegidos { list-style: none; margin: 8px 0 0; padding: 0; }
+.elegidos li { padding: 6px 0; border-top: 1px solid var(--borde); color: var(--texto); font-size: 13px; line-height: 1.6; }
+.elegidos li .chip { margin: 0 3px; vertical-align: 1px; }
+.elegidos a { color: var(--caliente); text-decoration: none; }
+h2 { font-size: 18px; letter-spacing: var(--interletra-titulo); margin: 26px 0 10px; font-weight: 800; display: flex; align-items: baseline; gap: 10px; }
+h2 .cuenta { font-family: var(--fuente-dato); font-size: 12px; font-weight: 500; color: var(--lavanda); }
+p.nota { color: var(--lavanda); font-size: 13px; margin: -4px 0 12px; }
+p.pie { color: var(--lavanda); font-size: 12px; margin: 14px 0 0; font-family: var(--fuente-dato); line-height: 1.5; }
+p.vacio { color: var(--lavanda); font-size: 14px; background: var(--superficie); border-radius: var(--radio-panel); padding: 12px 14px; }
+.tema { background: var(--superficie); border-radius: var(--radio-panel); padding: 14px 14px 12px; margin: 0 0 12px; scroll-margin-top: 70px; }
+.tema--elegido { box-shadow: inset 3px 0 0 var(--ardiendo); }
+.tema__cab { display: flex; align-items: flex-start; gap: 10px; }
+.tema__cab .n { font-family: var(--fuente-dato); font-size: 12px; color: var(--lavanda); padding-top: 5px; flex: none; }
+.tema__cab h3 { font-size: 19px; line-height: 1.15; letter-spacing: -0.03em; margin: 0; flex: 1; font-weight: 800; }
+.tema__cab .chip { flex: none; font-size: 11px; }
+.tema__meta { display: flex; align-items: center; gap: 10px; margin: 10px 0 8px; }
+.mercados { display: inline-flex; gap: 4px; }
+.pais { font-family: var(--fuente-dato); font-size: 11px; font-weight: 500; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--borde); color: var(--lavanda); opacity: .45; }
+.pais--on { background: var(--calor-2); border-color: var(--calor-3); color: var(--texto); opacity: 1; }
+.puntaje { margin-left: auto; font-family: var(--fuente-dato); font-size: 12px; font-weight: 500; padding: 3px 8px; border-radius: 6px; }
+.tema__tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.tag { font-family: var(--fuente-dato); font-size: 11px; color: var(--lavanda); border: 1px solid var(--borde); border-radius: 6px; padding: 3px 7px; }
+.tag--ojo { color: var(--caliente); border-color: var(--caliente); }
+.tag--red { color: var(--texto); background: var(--calor-2); border-color: var(--calor-3); font-weight: 500; }
+.tag--sube { color: var(--caliente); }
+.decision { font-size: 13px; margin: 0 0 8px; color: var(--lavanda); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.decision b { font-family: var(--fuente-titulo); text-transform: uppercase; font-size: 11px; letter-spacing: 0; }
+.decision--si b { color: var(--ardiendo); }
+.decision--no b { opacity: .6; }
+.decision--sug b { color: var(--caliente); }
+.decision a { color: var(--caliente); }
+.ruta { font-family: var(--fuente-dato); font-size: 11px; color: var(--lavanda); }
+.chip { font-size: 10px; white-space: nowrap; }
+.chip--pub { background: var(--ardiendo); color: var(--noche); }
+.chip--proceso { background: var(--calor-2); color: var(--texto); border: 1px solid var(--calor-3); }
+.chip--serie-tema { background: var(--serie-tema); color: var(--noche); }
+.chip--serie-efemeride { background: var(--serie-efemeride); color: var(--texto); }
+.chip--serie-semana { background: var(--serie-semana); color: var(--texto); }
+.senal { font-family: var(--fuente-dato); font-size: 12px; color: var(--caliente); margin: 0 0 8px; line-height: 1.5; }
+.senal a { color: inherit; }
+.senal .fuentes { display: block; color: var(--lavanda); margin-top: 2px; }
+.titulares { border-top: 1px solid var(--borde); padding-top: 6px; }
+.titulares summary { font-family: var(--fuente-dato); font-size: 11px; color: var(--lavanda); cursor: pointer; min-height: 32px; display: flex; align-items: center; }
+.titulares ul { list-style: none; margin: 0; padding: 0; }
+.titulares li { padding: 6px 0; font-size: 14px; line-height: 1.35; }
+.titulares a { color: var(--texto); text-decoration: none; }
+.titulares a:hover { text-decoration: underline; }
+.titulares .medio { display: block; font-family: var(--fuente-dato); font-size: 11px; color: var(--lavanda); margin-top: 2px; }
+.tabla-envuelta { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -16px; padding: 0 16px; }
+.tabla { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--superficie); border-radius: var(--radio-panel); overflow: hidden; min-width: 640px; }
+.tabla th { text-align: left; font-family: var(--fuente-dato); font-weight: 500; font-size: 11px; color: var(--lavanda); padding: 10px 10px; border-bottom: 1px solid var(--borde); white-space: nowrap; }
+.tabla th[data-orden] { cursor: pointer; }
+.tabla th[data-orden]:hover, .tabla th[aria-sort] { color: var(--texto); }
+.tabla th[aria-sort="descending"]::after { content: " ↓"; }
+.tabla th[aria-sort="ascending"]::after { content: " ↑"; }
+.tabla td { padding: 10px 10px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+.tabla tr:last-child td { border-bottom: 0; }
+.tabla .num, .tabla th.num { text-align: right; white-space: nowrap; }
+.tabla .c-titulo { min-width: 220px; }
+.tabla .titulo a { text-decoration: none; font-weight: 600; }
+.tabla .titulo a:hover { text-decoration: underline; }
+.tabla .sub { margin-top: 4px; font-size: 11px; color: var(--lavanda); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tabla .c-senal { font-family: var(--fuente-dato); font-size: 12px; color: var(--lavanda); white-space: nowrap; }
+.tabla .c-barra { min-width: 150px; white-space: nowrap; }
+.tabla .c-fecha { white-space: nowrap; }
+.tabla .c-fecha .tag { display: inline-block; margin-top: 4px; }
+.barra { display: inline-block; vertical-align: middle; width: 110px; height: 8px; border-radius: 4px; background: var(--calor-0); overflow: hidden; margin-right: 8px; }
+.barra__relleno { display: block; height: 100%; border-radius: 4px; }
+.barra__txt { font-family: var(--fuente-dato); font-size: 12px; color: var(--caliente); }
+.franjas { list-style: none; margin: 0; padding: 0; background: var(--superficie); border-radius: var(--radio-panel); }
+.franjas li { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--borde); }
+.franjas li:last-child { border-bottom: 0; }
+.franja { font-family: var(--fuente-dato); font-size: 12px; color: var(--lavanda); width: 64px; }
+.hipotesis { background: var(--superficie); border-radius: var(--radio-panel); padding: 12px 14px; font-size: 14px; margin: 0; }
+.hipotesis b { color: var(--caliente); }
+.dos { display: grid; gap: 0 20px; }
+.lista { list-style: none; margin: 0; padding: 0; }
+.lista li { padding: 8px 0; border-top: 1px solid var(--borde); font-size: 14px; line-height: 1.4; }
+.lista li.estratega::before { content: "estratega · "; font-family: var(--fuente-dato); font-size: 11px; color: var(--lavanda); }
+.puntos { list-style: none; margin: 0; padding: 0; }
+.punto { display: grid; grid-template-columns: auto auto 1fr; gap: 4px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--borde); font-size: 13px; }
+.punto .cuando { font-family: var(--fuente-dato); font-size: 12px; color: var(--lavanda); }
+.punto .regla { grid-column: 1 / -1; color: var(--lavanda); }
+.dias { list-style: none; margin: 0; padding: 0; }
+.dia { background: var(--superficie); border-radius: var(--radio-panel); padding: 12px 14px; margin: 0 0 10px; font-size: 14px; color: var(--lavanda); }
+.dia--actual { box-shadow: inset 3px 0 0 var(--ardiendo); }
+.dia__fecha { display: inline-block; font-weight: 800; letter-spacing: -0.02em; color: var(--texto); text-decoration: none; margin-bottom: 4px; min-height: 32px; line-height: 32px; }
+.dia__fecha:hover { text-decoration: underline; }
+.dia__fecha[aria-current] { color: var(--ardiendo); }
+.dia .sub { margin: 8px 0 2px; font-size: 12px; font-family: var(--fuente-dato); }
+.dia .lista li { color: var(--texto); font-size: 13px; padding: 6px 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.dia .lista a { color: var(--caliente); }
+footer { margin-top: 28px; font-family: var(--fuente-dato); font-size: 11px; color: var(--lavanda); line-height: 1.5; }
+@media (min-width: 600px) {
+  .pagina { padding: 24px 24px 64px; }
+  .pestanas { margin: 0; padding-left: 0; padding-right: 0; }
+  .tabla-envuelta { margin: 0; padding: 0; }
+  h1 { font-size: 34px; }
+  .ancho { display: inline; }
+  .mapa { grid-template-columns: repeat(10, 1fr); }
+  .dos { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="pagina">
+<header class="cab">
+  <svg class="re" viewBox="0 0 36 36" width="36" height="36" aria-hidden="true"><rect width="36" height="36" rx="6.0" fill="#0B0614"/><rect x="-1.7" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#11071F"/><rect x="1.6" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#120722"/><rect x="5.0" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#140826"/><rect x="8.3" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#160829"/><rect x="11.7" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#17082C"/><rect x="15.0" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#19092E"/><rect x="18.4" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#1A0930"/><rect x="21.7" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#1A0931"/><rect x="25.1" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#1A0932"/><rect x="28.4" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#1A0931"/><rect x="31.8" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#1A0930"/><rect x="35.1" y="-0.0" width="2.6" height="2.6" rx="0.6" fill="#19092E"/><rect x="-1.7" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#120721"/><rect x="1.6" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#140825"/><rect x="5.0" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#160828"/><rect x="8.3" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#17082C"/><rect x="11.7" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#19092F"/><rect x="15.0" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#1A0932"/><rect x="18.4" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#1C0934"/><rect x="21.7" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="25.1" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#1D0936"/><rect x="28.4" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="31.8" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#1C0934"/><rect x="35.1" y="3.3" width="2.6" height="2.6" rx="0.6" fill="#1A0932"/><rect x="-1.7" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#130723"/><rect x="1.6" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#150826"/><rect x="5.0" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#17082A"/><rect x="8.3" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#19092E"/><rect x="11.7" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#1A0932"/><rect x="15.0" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="18.4" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#1D0937"/><rect x="21.7" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#1E0A39"/><rect x="25.1" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#1F0A3A"/><rect x="28.4" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#1E0A39"/><rect x="31.8" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#1D0937"/><rect x="35.1" y="6.7" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="-1.7" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#130824"/><rect x="1.6" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#150828"/><rect x="5.0" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#8C2981"/><rect x="8.3" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#B7377A"/><rect x="11.7" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#B7377A"/><rect x="15.0" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#1D0937"/><rect x="18.4" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#1F0A3B"/><rect x="21.7" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#FE9F6D"/><rect x="25.1" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#FE9F6D"/><rect x="28.4" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#FE9F6D"/><rect x="31.8" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#1F0A3B"/><rect x="35.1" y="10.0" width="2.6" height="2.6" rx="0.6" fill="#1D0937"/><rect x="-1.7" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#140825"/><rect x="1.6" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#160829"/><rect x="5.0" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#8C2981"/><rect x="8.3" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#1A0931"/><rect x="11.7" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="15.0" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#DE4968"/><rect x="18.4" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#200A3D"/><rect x="21.7" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#FCFDBF"/><rect x="25.1" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#230B42"/><rect x="28.4" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#220A41"/><rect x="31.8" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#200A3D"/><rect x="35.1" y="13.4" width="2.6" height="2.6" rx="0.6" fill="#1E0A39"/><rect x="-1.7" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#140825"/><rect x="1.6" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#160829"/><rect x="5.0" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#8C2981"/><rect x="8.3" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#B7377A"/><rect x="11.7" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#DE4968"/><rect x="15.0" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#1F0A3A"/><rect x="18.4" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#210A3E"/><rect x="21.7" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#FCFDBF"/><rect x="25.1" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#FCFDBF"/><rect x="28.4" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#230B42"/><rect x="31.8" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#210A3E"/><rect x="35.1" y="16.7" width="2.6" height="2.6" rx="0.6" fill="#1F0A3A"/><rect x="-1.7" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#140825"/><rect x="1.6" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#160829"/><rect x="5.0" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#8C2981"/><rect x="8.3" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#1A0931"/><rect x="11.7" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#DE4968"/><rect x="15.0" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#1E0A39"/><rect x="18.4" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#200A3D"/><rect x="21.7" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#FCFDBF"/><rect x="25.1" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#230B42"/><rect x="28.4" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#220A41"/><rect x="31.8" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#200A3D"/><rect x="35.1" y="20.1" width="2.6" height="2.6" rx="0.6" fill="#1E0A39"/><rect x="-1.7" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#130824"/><rect x="1.6" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#150828"/><rect x="5.0" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#8C2981"/><rect x="8.3" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#1A0930"/><rect x="11.7" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#1C0934"/><rect x="15.0" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#DE4968"/><rect x="18.4" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#1F0A3B"/><rect x="21.7" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#FE9F6D"/><rect x="25.1" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#FE9F6D"/><rect x="28.4" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#FE9F6D"/><rect x="31.8" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#1F0A3B"/><rect x="35.1" y="23.4" width="2.6" height="2.6" rx="0.6" fill="#1D0937"/><rect x="-1.7" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#130723"/><rect x="1.6" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#150826"/><rect x="5.0" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#17082A"/><rect x="8.3" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#19092E"/><rect x="11.7" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#1A0932"/><rect x="15.0" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="18.4" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#1D0937"/><rect x="21.7" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#1E0A39"/><rect x="25.1" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#1F0A3A"/><rect x="28.4" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#1E0A39"/><rect x="31.8" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#1D0937"/><rect x="35.1" y="26.7" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="-1.7" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#120721"/><rect x="1.6" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#140825"/><rect x="5.0" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#160828"/><rect x="8.3" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#17082C"/><rect x="11.7" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#19092F"/><rect x="15.0" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#1A0932"/><rect x="18.4" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#1C0934"/><rect x="21.7" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="25.1" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#1D0936"/><rect x="28.4" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#1C0935"/><rect x="31.8" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#1C0934"/><rect x="35.1" y="30.1" width="2.6" height="2.6" rx="0.6" fill="#1A0932"/><rect x="-1.7" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#11071F"/><rect x="1.6" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#120722"/><rect x="5.0" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#140826"/><rect x="8.3" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#160829"/><rect x="11.7" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#17082C"/><rect x="15.0" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#19092E"/><rect x="18.4" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#1A0930"/><rect x="21.7" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#1A0931"/><rect x="25.1" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#1A0932"/><rect x="28.4" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#1A0931"/><rect x="31.8" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#1A0930"/><rect x="35.1" y="33.4" width="2.6" height="2.6" rx="0.6" fill="#19092E"/></svg>
+  <a class="marca" href="index.html">Radar Explica</a>
+  <nav class="nav" aria-label="Días"><a href="2026-10-29.html" aria-label="anterior">←<span class="ancho"> anterior</span></a><a class="off" aria-disabled="true" aria-label="siguiente"><span class="ancho">siguiente </span>→</a></nav>
+</header>
+<nav class="pestanas" role="tablist" aria-label="Pestañas del tablero">
+  <button type="button" role="tab" data-panel="hoy" aria-selected="true" aria-controls="hoy">Hoy<span class="cuenta">30</span></button><button type="button" role="tab" data-panel="resultados" aria-selected="false" aria-controls="resultados">Resultados<span class="cuenta">32</span></button><button type="button" role="tab" data-panel="aprendizaje" aria-selected="false" aria-controls="aprendizaje">Aprendizaje</button><button type="button" role="tab" data-panel="meta" aria-selected="false" aria-controls="meta">Meta</button><button type="button" role="tab" data-panel="historia" aria-selected="false" aria-controls="historia">Historia<span class="cuenta">11</span></button>
+</nav>
+<section class="panel" id="hoy" role="tabpanel" data-activa>
+<h1>Lo que está subiendo<small>viernes 30 de octubre de 2026</small></h1>
+<p class="actualizado">actualizado 07:17 · fuente: data/radar/2026-10-30.json (Wikipedia es, Google Trends, prensa, YouTube y TikTok de CL/MX/AR/CO/PE)</p>
+<nav class="mapa" aria-label="Mapa de calor de hoy: una casilla por tema, ordenadas por puntaje"><a class="casilla" href="#t1" style="background:#FCFDBF" title="Patrick Stewart · ardiendo · 8.57"><span class="visually-hidden">Patrick Stewart</span></a><a class="casilla" href="#t2" style="background:#FEA270" title="puma rodriguez · ardiendo · 7.56"><span class="visually-hidden">puma rodriguez</span></a><a class="casilla" href="#t3" style="background:#F3826B" title="Cuauhtémoc Cárdenas · ardiendo · 7.18"><span class="visually-hidden">Cuauhtémoc Cárdenas</span></a><a class="casilla" href="#t4" style="background:#DA4769" title="San Juan del Puerto · ardiendo · 6.43"><span class="visually-hidden">San Juan del Puerto</span></a><a class="casilla" href="#t5" style="background:#DA4769" title="Fátima Báñez · ardiendo · 6.43"><span class="visually-hidden">Fátima Báñez</span></a><a class="casilla" href="#t6" style="background:#AE3677" title="Emiliano García-Page · ardiendo · 5.87"><span class="visually-hidden">Emiliano García-Page</span></a><a class="casilla" href="#t7" style="background:#8D2A81" title="Salvador en Haití · ardiendo · 5.46 · elegido"><span class="casilla__marca"></span><span class="visually-hidden">Salvador en Haití</span></a><a class="casilla" href="#t8" style="background:#80257E" title="Súper Balón de Oro · ardiendo · 5.29 · elegido"><span class="casilla__marca"></span><span class="visually-hidden">Súper Balón de Oro</span></a><a class="casilla" href="#t9" style="background:#7F257E" title="Binance · ardiendo · 5.28"><span class="visually-hidden">Binance</span></a><a class="casilla" href="#t10" style="background:#71207B" title="trail blazers - grizzlies · ardiendo · 5.10"><span class="visually-hidden">trail blazers - grizzlies</span></a><a class="casilla" href="#t11" style="background:#601B78" title="Elecciones parlamentarias de Israel de 2026 · caliente · 4.88 · elegido"><span class="casilla__marca"></span><span class="visually-hidden">Elecciones parlamentarias de Israel de 2026</span></a><a class="casilla" href="#t12" style="background:#5A1977" title="incremento salario mínimo 2027 · caliente · 4.80"><span class="visually-hidden">incremento salario mínimo 2027</span></a><a class="casilla" href="#t13" style="background:#591976" title="Urda · caliente · 4.79 · elegido"><span class="casilla__marca"></span><span class="visually-hidden">Urda</span></a><a class="casilla" href="#t14" style="background:#591976" title="LZB · caliente · 4.79"><span class="visually-hidden">LZB</span></a><a class="casilla" href="#t15" style="background:#591976" title="Demencia con cuerpos de Lewy · caliente · 4.79"><span class="visually-hidden">Demencia con cuerpos de Lewy</span></a><a class="casilla" href="#t16" style="background:#511675" title="Lázaro Cárdenas Batel · caliente · 4.68"><span class="visually-hidden">Lázaro Cárdenas Batel</span></a><a class="casilla" href="#t17" style="background:#511675" title="William Contreras · caliente · 4.68"><span class="visually-hidden">William Contreras</span></a><a class="casilla" href="#t18" style="background:#431172" title="posiciones de fbc melgar contra comerciantes unidos · caliente · 4.50"><span class="visually-hidden">posiciones de fbc melgar contra comerciantes unidos</span></a><a class="casilla" href="#t19" style="background:#3B0F70" title="Amalia Solórzano · caliente · 4.40"><span class="visually-hidden">Amalia Solórzano</span></a><a class="casilla" href="#t20" style="background:#3A0F6F" title="Willson Contreras · caliente · 4.38"><span class="visually-hidden">Willson Contreras</span></a><a class="casilla" href="#t21" style="background:#3A0F6E" title="Ian McKellen · caliente · 4.35"><span class="visually-hidden">Ian McKellen</span></a><a class="casilla" href="#t22" style="background:#380F6A" title="Horacio Pietragalla Corti · caliente · 4.26"><span class="visually-hidden">Horacio Pietragalla Corti</span></a><a class="casilla" href="#t23" style="background:#340E64" title="Inundaciones de la DANA de 2024 en España · caliente · 4.11"><span class="visually-hidden">Inundaciones de la DANA de 2024 en España</span></a><a class="casilla" href="#t24" style="background:#330E63" title="Inteligencia Artificial · caliente · 4.08"><span class="visually-hidden">Inteligencia Artificial</span></a><a class="casilla" href="#t25" style="background:#330E63" title="Wall Street · caliente · 4.08"><span class="visually-hidden">Wall Street</span></a><a class="casilla" href="#t26" style="background:#330E63" title="Milwaukee Brewers · caliente · 4.08"><span class="visually-hidden">Milwaukee Brewers</span></a><a class="casilla" href="#t27" style="background:#320E61" title="Adif · caliente · 4.03"><span class="visually-hidden">Adif</span></a><a class="casilla" href="#t28" style="background:#310E5F" title="Charles Xavier · subiendo · 3.98"><span class="visually-hidden">Charles Xavier</span></a><a class="casilla" href="#t29" style="background:#2E0E5A" title="Ricardo Pashkus · subiendo · 3.88"><span class="visually-hidden">Ricardo Pashkus</span></a><a class="casilla" href="#t30" style="background:#2E0E5A" title="Melody (cantante española) · subiendo · 3.88"><span class="visually-hidden">Melody (cantante española)</span></a></nav>
+<p class="leyenda"><span>frío</span><span class="barra-leyenda"></span><span>ardiendo</span><span class="leyenda__marca"><i></i> elegido</span></p>
+<div class="resumen">
+  <b>30 temas</b> en el radar. Fuentes: Wikipedia es (60 artículos con salto), Google Trends (47 búsquedas), prensa vía Google Noticias (51 temas en 3+ medios), YouTube tendencias (84 temas), TikTok Creative Center (0 temas, sin respuesta). Países: CL, MX, AR, CO, PE. Puntaje: manda en cuántos mercados aparece el tema; &#x27;sensible&#x27; es aviso, no resta. Redes: YT/TT con países (+1 cada una, +0.5 ambas). Δ: cambio de puntaje contra el radar anterior; días: cuántos días lleva en el radar (nuevo +0.5, acelera +0.8, 3+ días −0.5).
+  <div class="cifras"><span>Wikipedia 22</span><span>Google Trends 4</span><span>prensa 12</span><span>YouTube 1</span><span>TikTok 0</span></div>
+  <div class="cifras" style="margin-top:10px"><span class="par"><span class="chip chip--subiendo">subiendo</span><span>3</span></span><span class="par"><span class="chip chip--caliente">caliente</span><span>17</span></span><span class="par"><span class="chip chip--ardiendo">ardiendo</span><span>10</span></span></div>
+</div>
+<div class="resumen"><b>4 elegidos</b> de 30 temas en esta corrida.<ul class="elegidos"><li><a href="#t7">Salvador en Haití</a> → Bukele envía fuerzas a Haití: qué pasó con los 4 militares salvadoreños <span class="chip chip--pub" title="publicadas/2026-10/25-bukele-envia-fuerzas-a-haiti-que-paso-con-los-4-mi">publicada</span></li><li><a href="#t8">Súper Balón de Oro</a> → Harry Kane gana el Balón de Oro 2026: 73 goles y lo que se sabe de la gala <span class="chip chip--pub" title="publicadas/2026-10/27-harry-kane-gana-el-balon-de-oro-2026-73-goles-y-lo">publicada</span></li><li><a href="#t11">Elecciones parlamentarias de Israel de 2026</a> → Elecciones en Israel 2026: Netanyahu vs Gadi Eisenkot <span class="chip chip--proceso" title="contenido/2026-10-25-elecciones-en-israel-2026-netanyahu-vs-gadi-eisenk">guion aprobado</span></li><li><a href="#t13">Urda</a> → Choque de trenes en Urda (Toledo): el AVE que alcanzó a un Iryo con el sistema LZB caído <span class="chip chip--pub" title="publicadas/2026-10/29-choque-de-trenes-en-urda-toledo-el-ave-que-alcanzo">publicada</span></li></ul><span class="fuente">fuente: contenido/*/meta.json, publicadas/**/meta.json · sin informe del estratega para este día (data/crecimiento/)</span></div>
+<section><h2>En 4 o 5 mercados <span class="cuenta">5</span></h2><p class="nota">Temas que se repiten en casi toda la región: lo que más pesa en el puntaje.</p><article class="tema" id="t1">
+  <div class="tema__cab">
+    <span class="n">01</span>
+    <h3>Patrick Stewart</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, CL, MX, PE"><span class="pais pais--on" title="Chile">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais pais--on" title="Perú">PE</span></span><span class="puntaje" style="background:#FCFDBF;color:#0B0614" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">8.57</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.10</span><span class="tag tag--ojo" title="Tema sensible: pasa por lectura atenta en el punto 3">sensible</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Patrick_Stewart">Wikipedia</a> ×140.8 · 118.234 vistas · Prensa 4 medios en AR/CL/MX/PE<span class="fuentes">fuente: Wikipedia, prensa</span></p>
+  <details class="titulares"><summary>4 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxPMXZ6bTFySEFIWC1YNmctWnloeEthU1ZkcVhVM0ZzMEVUVDU0WW83UGtISzlhUmotemtxeHp6Z0ZSbl9zZFhBYV92SjVvaVN2bWQ4Q3dNQUFpdnNpWWRFVzVLa212YmRZZ0JpQnRVZUJpV2thS3BrVnBfN19aWjJiVTNBS1lrcm9DR1RIQXVvTXRJMzUzTW9JR9IBmAFBVV95cUxOc18xcnVmMkZFWmdTQ20zbmpfSkxscmNsajNKb0FlRTVzVVJRZjg4RERveUFaSHJjQmEzREFZU3d6UmZyQ2ZualpLdVAwck9TcFA4TUlCMnhBdnhxNHNEVWFKSXZNSWRyRmxMYk8tQkdac01hVThFUXZrN3E3SGtCSFZpZVNWdU93S2J3dHdvSDBZODlCR3VITA?oc=5" rel="noopener">Muere Patrick Stewart, actor de &quot;Viaje a las estrellas&quot; y &quot;X-Men&quot;</a><span class="medio">DW.com · PE</span></li><li><a href="https://news.google.com/rss/articles/CBMiiAJBVV95cUxNMDIyQ2FnWHRTVXZXTWE3NzU5LVo4U1drTW96TFBTTlJMRDJGY3FOZ3cxRUdBemZFTjJheFgtaWI4cVNwdHVaeUZXeW4yMzZMSU9QencwVmV4blZWb2Rwejk0M0FNMWd5bXdzd3NqOW50NWdWa3ZJR0JEVURnMEF1YVN5NXZraU9qb2VXaWhNOXd2bURyV0hyR2tsREpMSElzMi1EUzlvbEItejNzQi1rZGpab3ktMDRlQkpiM3JFRElQZ3BnTWVuU1N5alJOUTRENHFsdVVDdHRhSVJRLWtJOHV6WnIyWlMtVmpyVWFzZWp3ckNhUHl3TE1OOEE4TzBUYlZqbElwN0o?oc=5" rel="noopener">&quot;Avengers: Doomsday&quot; que se estrena en diciembre será la despedida de Patrick Stewart en el cine</a><span class="medio">BioBioChile · CL</span></li><li><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTFB5NXNLRUtLYktaWlM3MXotdTZjUGFtUjlpVkFYMzd3X2J3enBNZGN1X1RVSF9YT0treUNQMEt5V1g4WmRHV3RwMzNlQ1V1NDBmNEJ6OHhwYk1CUjFz0gFiQVVfeXFMTWtObUFjRURYMHJKTk1EeHM3TXk3eWI4WEdHcjY0WXp1b1Zlbjc2QkszX0czWm53UVN1TVpwZ3p1d2NWcml0bHBKRzBWRnpNdUoxdEMzQVVrcWFGa1lyQzFKVmc?oc=5" rel="noopener">Muere a los 86 años Patrick Stewart, legendario actor de Star Trek y X-Men</a><span class="medio">BBC · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxNcFpXMWxlWi12RlRidkV3cDBtTGNfODhNTUZTUm9DMXpJOTJHbXgxYUtwelotdlBCUFZHbm01Mnd3LUxlblIweHpYTndoWElwdEVvRTRVQllNb2E3anZrWGlPa1hXTGZnRU9sLUlOamdnMG85THJSbkNPSlJ6TmNzTnh1LWgxTFVTa21ZblkzV2FJY3p6NGIzcVA3OXJRYXBSX0hMTklHRWQyWm9iM1R2S2tCdjdUallTemJLZG11Q3h1NGJxQ1ZyS2tNd0o3M3gwN1YzeGdCajhBaGE5amtQZw?oc=5" rel="noopener">Murió Patrick Stewart, estrella de Hollywood: su imperdible anécdota del día que conoció a Messi</a><span class="medio">TyC Sports · AR</span></li></ul></details>
+</article>
+<article class="tema" id="t2">
+  <div class="tema__cab">
+    <span class="n">02</span>
+    <h3>puma rodriguez</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, CL, CO, MX"><span class="pais pais--on" title="Chile">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais pais--on" title="Colombia">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#FEA270;color:#0B0614" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">7.56</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.09</span><span class="tag tag--ojo" title="Tema sensible: pasa por lectura atenta en el punto 3">sensible</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal">Google 500+ en AR · Prensa 7 medios en AR/CL/CO/MX<span class="fuentes">fuente: Google Trends, prensa</span></p>
+  <details class="titulares"><summary>9 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMirgFBVV95cUxOUFlOUTAxbV9reVB6b1g0X0JrdVBRaHVManhlc0g4QkVDUkFZY3NBaElJdldtbk90QW5nX2NiMEJZRTk0Y3RHeUxjaFp1dTgtc3Yya0g1OUJXWkMtdElCLWZiWXByTnJNbVBXWXQ0U3hXQTk4SkVrc2tuVGxKdFlyOU1GVWp0V0hHSzRZMWY2VFduX3ZKX2FwUkFHMTkwVjlSUllpd0FfaF9iVUk4a3c?oc=5" rel="noopener">Delcy Rodríguez dice que devolverá algunos activos estatales no esenciales a sus antiguos propietarios</a><span class="medio">CNN en Español · CO</span></li><li><a href="https://news.google.com/rss/articles/CBMi3wFBVV95cUxOcll6bURDWWhGejJNV2R2RWZLY1g3LWFiYmUyRW8zYnBrbG0xODZxdGxWT2FMQ0dnNkNEdE9NeVU1M2tLY0NEN190VGVucG8xTE43MVRLVURSYjBfaU5yS2JFbGw4RC1JaWs2aEdGMjRFZFU2VVNSYlhkLU9ES0dBS08wVzdnVi1UMGx5Z3lINExjMWcxZk5LQVVERlZkdmdaczFJM0lQanowWHF6S2dKMjVoanJ5WXZmNWRTQVVwMTZOTkpjWVJvNF9NZ2lfd1ZzVm5HV0xUOUNBeVFKcDVN0gHzAUFVX3lxTE9DVm1qQll5dzlfT3FjTkpGVDRKT0d3ODgyekI4VVZObERrcm9RM0RKcDNtaDA3TG9CTHdQM2paRzhXMlFaNFdFdDFoQ0FPSjBxMnM3enY1Q1BJSHdnWFRKTTRPUkw4QnRFOXVJMm45OXZTTWRMT2I2cWNvNUVnWlJpLWZLbG5SZ1VHZlVFXzBNV01JME9BQlZNUG9Jb3pXWnJvRk9IMXhxakNNOHdxTGc3R3ZlX2NIb2pZbGsyUDZEMFZsUlBBSnZVNktIaWF1NEs4UWpNbUtTcDVVMU1aUWY4WWNnWjJPN0VvMXNNZFRFeW9HSQ?oc=5" rel="noopener">Georgina Rodríguez, doctora en Biología, sobre el escarabajo bombardeo: “Puede disparar 500 veces en un segundo”</a><span class="medio">TN · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMijwJBVV95cUxNSm5DMEdWRERnOFFoaHVHZ1ZzdmZha3hRamY1R0RLRzI0eEM2UkVGb2Q2aEFzQ3lyY2lXRlFkamVaSHNob2hib1FpU3NDSTM1Y1Y0X1FBTXMyXzRnY1RmT2NfX0R5ank4YXl2dkxTQTFSZ0hYY29XOU1YWm9UUEoxd2xzMWxLRDA4aWU2bjQ1UHlFam8yZC1UaENIdGRJenJLWDJSVEs1MllVTURMTWFjbnI4QktHRlBtUWluUkN5eVhxbUFDLWx4N0Q2Zll3Wk1zRlR0MXhqc05WWUxOLXM4MGFweUF0TWZnQnFQRTF2TXFJSGlFWDMyTnBXcnlOa19ma1c3SGhvT1NxOWUySTJB?oc=5" rel="noopener">Machado dice que no planea reunirse con Delcy Rodríguez en discurso transmitido por la TV venezolana</a><span class="medio">BioBioChile · CL</span></li><li><a href="https://news.google.com/rss/articles/CBMi5AFBVV95cUxQTTluaVpoN016Qi1CNmowRWxGa2RfUEl6UGQ4V0V4ajlNbU0yRFByS0lJUGh2Tm1tc05GRFQ4d2lkTFNEVmxPQS1xUmgtMk8zblROYTRCc29kdlRlMzJYdHdwckRlWGh4Y1ZIMkl3dGNDZ3g2RTlCelNfeGRrbFZBOGFKV29ydURhUldvaUFBVU1lMnRISUV1S25Qa21BQXIwV2NBX09fQ3RIaVBEdjVwTy1CeTdyd2I0TDJtU0lHSlJSd2t3YmNwX0g2QjFXNHpoLUVrM3ZmUklkdkZSZmtxTXNJZ27SAf8BQVVfeXFMTzdUYXE5d2x1cnFzM2N5ZHlfeGpvMDNHLVBFRkN0UzhrSHVXNUt1X2pseFR2RlJRaktLbnBaX1hrNmRiT2YzN1FLeDlMUm92Rk51WnlPdm5xT2FsMTJsQXh6Q1pRMGFOaUY2Mzh5MFc3X3RDNE5oQ1k3YWYxVnFHbXViWXlCQXdIc252MXRPUnR2NFhndUVTRU9Uai1tUFZOTm0xWlM3VDJONDNZT2l0RE5YY3FqMkE3SUtrai1ZVzRiSDJPV2w5X0FFNWZyMG9FTHBBRmRNcUVfU212M2l4amg3cGFPOEduOGQzREt0TUxjdzVWa3NOeDFVNmdCU3NZ?oc=5" rel="noopener">Delcy Rodríguez volvió a prometer elecciones en Venezuela, pero no puso fecha y pidió “apoyar las reformas”</a><span class="medio">Infobae · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxOT3N6a2NCUzJOUnVhMmpFQ2VXeHE5bFhkQUswNXJ6aWJ1ME1kbS1SS3pDVTg3cHVmUzJ5c1MxYy1VSnhhSVZvbE11d0gtTTNEeVhCZDU2TkR4dFZmaGFsT1RxaDBRd2liN3FPcXZCaldZTDZPTU9BTVJocWIxakZZT1ZtcTlTb2tOdHlFMVdYY2lnZDl0QjFpcGI5Q0tHYmI4eWVRM0dhWDR0Vjl5eGtKZ0FDVFcwMlozZjFadEVPZ0o?oc=5" rel="noopener">Delcy Rodríguez anuncia que habrá elecciones en Venezuela &quot;con una autoridad electoral renovada&quot;</a><span class="medio">Teletrece · CL</span></li><li><a href="https://news.google.com/rss/articles/CBMi5AFBVV95cUxPcHAzTEV5VHRFTldudmQ1bnV6RDNNQkxkQkdyWnpJblZqQ0NEX3lZdS12VlYzTGtBa3JIRWcwOE5UTEpnM1l1Y29IeGdiSldYX1U0VEE0WGFOQ0huNUtnQVRBS0ExME1yN3BZcXlNWmpiZ1dScTMxNUs3S0lxWFhYVkh0VE02UlBOc01ORzlxd2dxaEpUWld1NW5zcmpiXy05Z05kcXg0M193a1I4MkVlREFvMllFSUM2eVp0SHRsejYxdG96bUVMRGlRUldnVkRBNktJaVRxdDExOUhwYzlZVkhub0XSAYYCQVVfeXFMTWswc1E0ajFsQmdwZjV5dElsbzhVeklHbFNROEp3SldxV0FVSklnOVFidnZzcFltMjU2UUtpMkNqNkV1cGVaSmxweFVnNXNTYjA0Q0w4U29GMUFCV0FnYmRnd3U1RHluYVpfT3lVd2x1RkEzTlYwaTNaR09YX25oSGFsMTVkQk5vQm1yMjJ4Zlk4R2hjUEtMVFlHZ1dZUDlwbVczczgyZnRmaGw5TTMwU1dVNGItVWdoUUR1eGd4R25YMnBQeml5MEpFZUt5cmR5eERTeVhXV21CcHVNdm9sSGRWZW50Nlg4cnJGSnR3TUx0UE5xRWVYT3VzUnlCM2RJYWhfMlZEUQ?oc=5" rel="noopener">“¡Atrévanse a decírselo a una mujer! ¡O a mí!“: el desafiante mensaje de la Capitana Rodríguez que alteró a la Cámara</a><span class="medio">La Cuarta · CL</span></li><li><a href="https://www.eltrecetv.com.ar/videos/es-mi-sueno/2026/10/29/la-inesperada-sorpresa-de-tomas-cochello-en-es-mi-sueno-para-el-puma-rodriguez/" rel="noopener">La inesperada sorpresa de Tomás Cochello en Es mi sueño para El Puma Rodríguez</a><span class="medio">eltrecetv · Google Trends</span></li><li><a href="https://eldoce.tv/show/2026/10/29/joaquin-levinton-le-dio-mondongo-en-la-boca-al-puma-rodriguez-y-su-reaccion-fue-imperdible/" rel="noopener">Joaquín Levinton le dio mondongo en la boca al Puma Rodríguez y su reacción fue imperdible</a><span class="medio">eldoce · Google Trends</span></li><li><a href="https://la100.cienradios.com/videos/video-el-puma-rodriguez-probo-una-pastafrola-por-primera-vez-y-causo-furor-en-es-mi-sueno/" rel="noopener">Video: el Puma Rodríguez probó una pastafrola por primera vez y causó furor en Es mi sueño</a><span class="medio">La 100 · Google Trends</span></li></ul></details>
+</article>
+<article class="tema tema--elegido" id="t7">
+  <div class="tema__cab">
+    <span class="n">07</span>
+    <h3>Salvador en Haití</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, CL, CO, MX, PE"><span class="pais pais--on" title="Chile">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais pais--on" title="Colombia">CO</span><span class="pais pais--on" title="Perú">PE</span></span><span class="puntaje" style="background:#8D2A81;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">5.46</span></div>
+  <div class="tema__tags"><span class="tag">otro</span><span class="tag tag--red" title="En tendencias de YouTube en AR, CL, CO, MX, PE">YT</span><span class="tag tag--sube" title="Cambio de puntaje contra el radar anterior · fuente: data/radar">Δ +0.95</span><span class="tag" title="Días seguidos en el radar">3 días</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.05</span><span class="tag tag--ojo" title="Tema sensible: pasa por lectura atenta en el punto 3">sensible</span></div>
+  <p class="decision decision--si"><b>elegido</b> · <span class="chip chip--pub" title="publicadas/2026-10/25-bukele-envia-fuerzas-a-haiti-que-paso-con-los-4-mi">publicada</span> <span class="ruta" title="publicadas/2026-10/25-bukele-envia-fuerzas-a-haiti-que-paso-con-los-4-mi/meta.json">Bukele envía fuerzas a Haití: qué pasó con los 4 militares salvadoreños</span> <a href="https://youtube.com/shorts/qPe5fldnAUA" rel="noopener">ver</a></p>
+  <p class="senal">Prensa 5 medios en AR/CL/MX/PE · YouTube 4.676.053 vistas en AR/CL/CO/MX/PE<span class="fuentes">fuente: prensa, YouTube</span></p>
+  <details class="titulares"><summary>8 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxOeGZnTk9YSXg3MG1HNTlfdTI2V3pZakdMQzhqSXkwS1JNT3BSZjdFUGw3eWNEa0xxM3BNUmJyNWY5MmpoNEVXX1RLT05WTXlKYVZmSUFTTUxjcFRITUxpVzVpZDZOUVVTUjk3MHFFTUxnQmNXUGtDdXVMcVFEa08td3lpNEZ2Z2Z2blM1dkExcG9EMWhnNTEzNjlyNE1yOFE0MV9ncmh2SEhMb20xVTFyMHBoMTg3bGozZllMWVcxSERlWEt10gHEAUFVX3lxTE9zWVdkNDZfZExlckJfMW5ZdVdsalllbHN5a25KblZOQTVLbUhZX0g4NkpFXzJISk9pTjlVTVdkUDlJZGN6RDRCUk8zUkdVeW5RejVOQlBmd1lMVFVnVndPOWx4VEpKME0yQXhqa3RXVzVaY3dNaENIT1Y0TENGLXd3MEYwM0FncXRUMVNkNmZudENyWGtyWTVoVTk4aW56RGZBcHJiclRJZGhkeEYycC1ibUM3NFdkTEg4REd2cEhYeTdQamk?oc=5" rel="noopener">Nayib Bukele aclara que operación salvadoreña en Haití no es una invasión</a><span class="medio">DW.com · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMijwJBVV95cUxPT3oxclpPaXdrQ3V1T01CMExRYnJnTTZRT2htT3lWTlM3cWtqN0l3SW93N2s3Yl94bTREbk1jdzdFNXE1N193RFZ2Mml1XzdldFNZMmFQSjJlWUZ6SEc2di1MckFDMVRXSFotUUV5WHZtaVA3RVdXQnJsZENqcjlUYXJmX1hoVlFuYWNMcEVUSnJVRW42ZzBQVzVhY1VBUzRjeVpBaHVjSkF0Y3gzR2Y0dnQ4NWFPRnQyei1WX05qTFBwWVdzLUdLYmVaV2JHTHE5RXpBb2Z1NC0zSDJZam9yeW5BNDJyZFlpd3JZNV9pQzlkU3A3c1hvVWJZYktPQmNJSy1oRTA4Z1VCMVhsNkFZ?oc=5" rel="noopener">&quot;Idiosincrasia de la delincuencia en Perú es distinta a la de El Salvador&quot;: Bukele dice que copiar su sistema de seguridad de forma idéntica no tendría sentido</a><span class="medio">RPP Noticias · PE</span></li><li><a href="https://news.google.com/rss/articles/CBMi6wFBVV95cUxQczY0VWxtaHBaaHNHQlp1dFFmaDJOZzMtbC10LUt5eUpoT1ZVV0Y2b2R1aWdJWHZxTDhSdjF6RUpualJQVVNfWWhyNWo2c0tUMFotS0liY3hscURqVzVvbWMtX293MG1HNFpvM3NtY2szNEV2QzNTRW82NHEtcVo1cGZ5dHZ6czFIZnVCV0dnMThLclNBaUFDRmtZWWV4cU5SZ1k3bkR0UVlETVJMQU1wXy1zVmkzd2xKX1pCTElXZHBCWWVWc3ZnMEUyWm9lb09zQ2R6dEhRR3N4Z3huMkhJTWdXVUxkSVlqcGZz0gGGAkFVX3lxTE5rRUZqM3pYMVRYeGxqUXZRcjJOOVlmTjl6allybnNxQmZfaURyY1NXTW1hZFoxZU5rZ1p3alh4bS16XzRuaU5jRDI3V3MyT1lfX0dKY3hOU3VObm5hUVpIcGhpUm1aVmVqVWxlN3BDMm5DcnpZc2c5alNsYWZjZDdpZVlBdDNxQWx6MUJXZm5lbnZoNndEZ0xiaVZKNHg3TWIxdFNUY195Z1ZlN1VrakdPVzBBM0MtUEZyaTlXTXgwVl90Q1dFSU9yM05IU0JQVmpIOXFBX0REUy0tNENxNnQ2ZnNFRzRzN3FVZk9Sa081ei1yVTNtVllVNEZLLTVUcVFPQkthQWc?oc=5" rel="noopener">Keiko Fujimori confirma en El Salvador que las seis cárceles en construcción en Perú incorporarán el modelo Bukele</a><span class="medio">Infobae · PE</span></li><li><a href="https://news.google.com/rss/articles/CBMiiwJBVV95cUxQRmJlVGNMODd0VXFFRkZIdWd1UHQtN29JcnBsT2VzdnVhNHZoM0Y1UXpYY3Zkd2JRQ3ZfT0ZsdjhXay1sXzZoS29XT2xwc3hkZXhsaXFBeElfRTI5dkdqWFpfNTRxanA0bTY3ZWJFZmY2YjZTNURGb3VKZjlmeHNuYlR3MlFHdnVpRkNGa3h1RWt5VTZmRWxibFBJRHpacnA1UkdBd0hNR0szalM0MkREZGF5NC1wRS1PdjhjdGNjYVdIc3dUa3JyVF9icnBzRVBCWklJM3FqbnQtV1hSQUJiLU5wdDZlQTJoM0JScXdHS3lGb25vVk9sam8ybE8tNk5KbmRPeWhUREtqc1U?oc=5" rel="noopener">Bukele muestra despliegue militar de El Salvador en Haití para misión de rescate y niega invasión</a><span class="medio">BioBioChile · CL</span></li><li><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE56TDFiLTVfaEc2R3JUTFUzRnpHVFE0SUx2Z3lBbDdXRVlVR002N0Z3RXlUS3RZZkNlNFRvUFZSZFNBNjE2WXQtNGN2eHBmTmRjSE93aDRSa1NvMEtK0gFiQVVfeXFMTkpWeXlPc2tNd3l1NTZhOTh3bTVNbTkybUtnOTlfZEFtakhQSjZQS29iTWlxMEt4S0J1X1NaNjZRZUN0Ynh2eTU3clBPQXozOUZNVi1kVmVjWjl5TW1qVTBTdlE?oc=5" rel="noopener">&quot;Vinimos a luchar contra los malvados&quot;: Bukele muestra el despliegue militar de El Salvador en Haití para rescatar a 4 soldados secuestrados por las pandillas</a><span class="medio">BBC · MX</span></li><li><a href="https://www.youtube.com/watch?v=7HwcW4LtQdU" rel="noopener">4 Salvadoreños secuestrados Bukele envía FUERZAS ESPECIALES a Haití para este rescate ⚔️🇸🇻 #bukele</a><span class="medio">Funcionario de Prisiones · YouTube CL · 1.927.119 vistas</span></li><li><a href="https://www.youtube.com/watch?v=7HwcW4LtQdU" rel="noopener">4 Salvadoreños secuestrados Bukele envía FUERZAS ESPECIALES a Haití para este rescate ⚔️🇸🇻 #bukele</a><span class="medio">Funcionario de Prisiones · YouTube MX · 1.927.119 vistas</span></li><li><a href="https://www.youtube.com/watch?v=7HwcW4LtQdU" rel="noopener">4 Salvadoreños secuestrados Bukele envía FUERZAS ESPECIALES a Haití para este rescate ⚔️🇸🇻 #bukele</a><span class="medio">Funcionario de Prisiones · YouTube AR · 1.927.119 vistas</span></li></ul></details>
+</article>
+<article class="tema" id="t9">
+  <div class="tema__cab">
+    <span class="n">09</span>
+    <h3>Binance</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, CO, MX, PE"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais pais--on" title="Colombia">CO</span><span class="pais pais--on" title="Perú">PE</span></span><span class="puntaje" style="background:#7F257E;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">5.28</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.05</span><span class="tag tag--ojo" title="Tema sensible: pasa por lectura atenta en el punto 3">sensible</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal">Prensa 5 medios en AR/CO/MX/PE<span class="fuentes">fuente: prensa</span></p>
+  <details class="titulares"><summary>6 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMizAFBVV95cUxOR042bThIMVZDUEZkeEJzaGZlRFlCSEs0WndWZnNyOUZ6V2ExZ3pqdXNtcXJ2d3Y3eGhGWTRyZU1QeXptbU5WbE45NkoxaDlCeEVUUTcwUlRPa285aXpreHAxbXNJMTZ5Wmt0MmN2TUtXR1huSEdGRm9JLUF4VVVRMlFyeldJTE1WMmpXeFQ5SXE0anRrb0VVSDRjTF9ZaDJIQjB5NUk5eUd5RjRZdXFIMG1pcDlEVnQwVkplTVloSGpqS05BUkdxaUpfTmI?oc=5" rel="noopener">Alarma en el mundo cripto: Binance investiga un ciberataque masivo de hasta 6 mil 300 millones de dólares</a><span class="medio">RPP Noticias · PE</span></li><li><a href="https://news.google.com/rss/articles/CBMif0FVX3lxTFAtNkdMNlA2akZEQ0JtQjlfcFFzY1VyOE1lR2M1X1RuVENVdXdhbWcyeURZNHhDYllUMFhmZXhWa3dXV2R3cjJsMTctMVR4MWZLT2xKOWtUdXA2MWFma1lPYnFyOU52VHFnb1RES0F2ZUdCNDAyM2hFcURfOTdGMkU?oc=5" rel="noopener">¿Binance está siendo hackeado? Salida de 2 mil millones de dólares pone en duda los fondos de los clientes</a><span class="medio">BeInCrypto · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMi-AFBVV95cUxNcmJhZl85dmhDZGV6U0pNSDdYVzR5N1ZSd3BhMjA0MVVGX0lsVGJXMGs2S192Zk9CY0JUb2NiN3JnVVhoVDU2X1pJaENzUWlLWTFvLUV1b3h2VGh3NFZFVUMzS05RV0lvanlnWWpSOGVqSkhya2FTUEpCWVNFSmR4SVlfN3J1Z3Zld0JUUjV1bEl2c2NDLTNKcGFHTUEtdWJRTS1MaXhvSnlSX2JOWTVWaVViQnlZZ2ZORW9wRVBjaTZMTVhXU29jR2tMOVhHR2RfT05ObXItUXA4QWZ2OUJoVEtPdzNNZms3UnVBTjBmR3NTNFdwa0pnQw?oc=5" rel="noopener">Posible hackeo a Binance sacude al mundo de las criptomonedas: cifras irían de 2.500 a casi 5.900 millones de dólares</a><span class="medio">Revista Semana · CO</span></li><li><a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE9FUGFPN0hkMllpWGdjcGpJSEcwcEhaTXNHLU0weVdNTE1ycElOdTVRY1ZUUS1TclhnNFc1bHBsM0xKUWw1ekFZcEoyM1JJOG15V3RFXzE0bHBYNGhpbFhScVpEaUNPTE1neG5RdXBUSlJQa3RldW5v?oc=5" rel="noopener">Las liquidaciones cripto superan los 628 millones de dólares en una hora mientras el miedo a un hack en Binance hunde el precio de Bitcoin</a><span class="medio">BeInCrypto · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMib0FVX3lxTE52U1VfMUJWWkNuc2VuMGFWeW80cHVzZlRxVnY0ejFvdnJoYlpGd1FpaHl2MVRDWnhmTm5QX0dKSEh4UTB6d1QwdEhsdklodjlOZzZhVkM0VEx6TURvSlh4NEZQQXRKa0JSMHl6ZGtnVQ?oc=5" rel="noopener">El precio de Bitcoin salta a 81.500 USD mientras los datos del PIB de EE. UU. superan las expectativas</a><span class="medio">TradingView · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMipgFBVV95cUxPWXI0MDN3RmI0Qi02X1RDb2ZlSzhmM25SZXg3YVg0bXVoS0s4eHBkZkZ6NmxWZW5hMENCY0hVZG1rM1UzSlJFOFo2NjhobHBsanhYUF9zb2xJWm5YV0tSeDV4bVlfUS1ucTRfN011OUd6TWtVRTB3RDdhcHU3TklzRGJPS2ZrMnpiNm51Z1JaWXlSTnFzeTNuQ2d2SXhTX1BYTk90bmF30gGrAUFVX3lxTE50anBqVnhFNlJxZHFRSW1kY2dDei1DZTJnMVAtY1EwM1JEekg0LWtDZjhfSkZ1UjctTFNfTEdKVmI1RzZpMFNEV3NTWW5qblJjN1hEelppUnkyMTh4bUpBSEJoMmlZXzdnYmUxSkFYN3dpd3M5NGdzQ09hQnpIdWVzT0Q4dmR1Y19Ncm5PUW51STIwSDAxTjJpbXlMR3c1ZXZqTUlyck0yWFJxQQ?oc=5" rel="noopener">Por qué Bitcoin no reaccionó a la decisión de la Fed</a><span class="medio">iProUP · AR</span></li></ul></details>
+</article>
+<article class="tema" id="t10">
+  <div class="tema__cab">
+    <span class="n">10</span>
+    <h3>trail blazers - grizzlies</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, CL, CO, PE"><span class="pais pais--on" title="Chile">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais pais--on" title="Colombia">CO</span><span class="pais pais--on" title="Perú">PE</span></span><span class="puntaje" style="background:#71207B;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">5.10</span></div>
+  <div class="tema__tags"><span class="tag">deporte</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.11</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal">Google 1.400+ en CL/AR/CO/PE<span class="fuentes">fuente: Google Trends</span></p>
+  <details class="titulares"><summary>3 titulares</summary><ul><li><a href="https://www.espn.com/nba/story/_/id/50325662/trail-blazers-ja-morant-exit-grizzlies-hamstring-injury" rel="noopener">Trail Blazers&#x27; Ja Morant exits first game vs. Grizzlies with hamstring injury</a><span class="medio">ESPN · Google Trends</span></li><li><a href="https://www.fantasypros.com/nba/news/616499/ja-morant-suffers-hamstring-injury-thursday.php" rel="noopener">Ja Morant suffers hamstring injury Thursday</a><span class="medio">FantasyPros · Google Trends</span></li><li><a href="https://bleacherreport.com/articles/25527076-ja-morant-injured-revenge-game-vs-grizzlies-box-score-stats-highlights-dame-cam-boozer" rel="noopener">Ja Morant Injured in Revenge Game vs. Grizzlies, Box Score Stats, Highlights for Dame, Cam Boozer</a><span class="medio">Bleacher Report · Google Trends</span></li></ul></details>
+</article></section>
+<section><h2>Resto del radar <span class="cuenta">25</span></h2><p class="nota">Suben en uno, dos o tres países, o solo en Wikipedia.</p><article class="tema" id="t3">
+  <div class="tema__cab">
+    <span class="n">03</span>
+    <h3>Cuauhtémoc Cárdenas</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, MX"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#F3826B;color:#0B0614" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">7.18</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.08</span><span class="tag tag--ojo" title="Tema sensible: pasa por lectura atenta en el punto 3">sensible</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Cuauht%C3%A9moc_C%C3%A1rdenas">Wikipedia</a> ×111.1 · 93.331 vistas · Prensa 3 medios en AR/MX<span class="fuentes">fuente: Wikipedia, prensa</span></p>
+  <details class="titulares"><summary>3 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMivwFBVV95cUxNRFR4dEpLTS1NVmhwQlAxdWhra212S28ybU5GemRIUUNFRlFsZjdqb3VBLWFCTFV5emVaT01Jc1NCYU54R3B3SVk4dzJhN250Rk5aNzl3NDBLWkhCVFNFeExCRkNmZnJKaEo4dlBQNmt1TG84R1dndFZ0U3dVZ2p5MUdNMjlfSGVnMzc3RjNjRDVxM0hkSmo0amlnblRETUVaSWIyMHFmWkRZWS1LbUR1M0U5ZGNXSy1nQjN2VGlDSQ?oc=5" rel="noopener">Bellas Artes abrirá sus puertas para despedir a Cuauhtémoc Cárdenas</a><span class="medio">La Jornada · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMi0wFBVV95cUxQN1k4N2U3RXVOX1pUeS1kU01XekZqSHBJTXhNNmt2N2JPNjY4WmREam9aWlNhVkVjZ3VHN3lILVV6LS1JWVNtMGJpMTgyVTUtSDVFSTFDaUF1d2JEZFhPN1AtRUN6RF9WRHJVLXdKWnpBaS12bkVaVnJIdF8xYzRpMEIyVVV0aWRHcWlLYlhkZHRVNUFKLVhQeEd1T0xLSXNjeEhOLU5pSlVwWFNkSmJ2SVdCTW5XdHVLZXRSVG56aGR4MzB0TnFsQmRpdVZiYTlDZk5Z?oc=5" rel="noopener">Cuauhtémoc Cárdenas es despedido en el Panteón Francés: “No serán suficientes todos los homenajes”</a><span class="medio">EL PAÍS · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMizAFBVV95cUxNUU9ZelJlcWpEM1VSaUtoTi1BdWVrX215VDZhQmN3Tlk3V3RKMHdmS29NNTJEQnhmMGloQUNGLTI4LUlhZmRCZjB5WWxBdFZPZ1JVSFVFaW1WUElZQXFRMXFRX0x5MzYzMnBMRnk0ekJvTXBjWWFSdUdOeGNheUk3cUpnMmI3U09FNl8tclc3VzNLOFVrSUpGSDFrcDV1VkxvVHhaSnR2b2ZkZEhzUm5CbWV0OHBwVTZkNkJRMGZZUkdualN0cEtrTGZPNDnSAecBQVVfeXFMTTBJTU82d3VHZTZ3WlJlcWVUX1kzdzhrei1raXY2QzBzUWNPTDZLZW82T1ZhTWp1bUJDOTdpcHNfLXBZaTVRaFF0OUtfMkRLNGpNRllxb2gxQXd6WXJJOTQxUU03dU56ZDVEMjA0NUtac2hCWkNLLXlmVW1abUlDdVdNSXhubW10SDgtS0VLdEx2a3pUWjBhMVd0Ul8zOHJXTVU0YVBVNGdPWUltak5pUmJDamxzN2dDR3JEY3VKY010M1ZiODZSVGw4QjF6a1JlMmROYmNobENWRDFvdk9ZU1RIVjZnbXdF?oc=5" rel="noopener">Murió Cuauhtémoc Cárdenas: trasladan cuerpo al Panteón Francés para su funeral este jueves</a><span class="medio">Infobae · AR</span></li></ul></details>
+</article>
+<article class="tema" id="t4">
+  <div class="tema__cab">
+    <span class="n">04</span>
+    <h3>San Juan del Puerto</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, MX, PE"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais pais--on" title="Perú">PE</span></span><span class="puntaje" style="background:#DA4769;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">6.43</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.04</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/San_Juan_del_Puerto">Wikipedia</a> ×4.0 · 3.338 vistas · Prensa 3 medios en AR/MX/PE<span class="fuentes">fuente: Wikipedia, prensa</span></p>
+  <details class="titulares"><summary>3 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMi9gFBVV95cUxNRGxiTVI4ajNianBkNGtpTmZZbGtWVHctUmZNXzVEZjNoZlppa2RIOWw4RUtHNTBDM1AwQzRQa25KMjFndUFjVTloSTk5d0lwYUtYWHlrNTR3WVhlNW4tY2paSWszcExZM25RTDUtQnJYOFZ6Z1o2MDVhZTlCb2pWN3Aza2dQWDBpUmY5bjg5bjVMMW1EamZwYjZjVS1aZGpQVGxqNEZRNjhGNmJWbjRrTVUtdVg1WE8yS1c2bjFzT2Z0dV94VmhLdDAwTGI1dXNtNDBqNzhJeTFDRmoxOWp0V204bnNhSTNjYnlQRWdlSko3NFhlcVHSAfsBQVVfeXFMTUpNdVRmNnVQZndhWGJ1X0hpT0Q3LWcwZ1l0Z3JvUnV1SVNZWGhXSS1KTmhPaHAxajlPY01kN0tuZ0NQTFZyb0cxTXZFQTEyS2RIbHU1dkFhR1lWcTRGSzlmRjlEdThOb0x4TDdCSVVKNmVTejhSYU9LcW5rZHJWQTJ5V2tCTzc1QWpzV3FfSDJrTENibXBqX1NEMGRnMXlsZi1yc2hfNUdIMnNsRkZXLXZuSW4zZ1l3ZmtCZURfZ1ZCN2p2ckhjdTdXQ2p5QmFHUjBfSVZpX1d0SmhvNURnOFBwVkh6a25hRDZKbGJRVTdHX09DalBqT0tHTXM?oc=5" rel="noopener">Hígado graso en Puerto Rico: hasta 25% de los casos de cáncer hepático surgen antes de la cirrosis</a><span class="medio">Medicina y Salud Pública · PE</span></li><li><a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxNdzNFeFMzQ0ZRRm9kUmxIV01YdDNSSW04OXpOZk9YVzU3SHVyUlFuY3g0WllBOU85bFlIZlloczZnSktEcXB4YnNZdHpGc3RzX185dzNGTExKLTJKckY3aFpnZnlHcElRM0w0UG5KbWpnRWRkTmViS09QV0lnc2NrNlh2Z1BkazU2ZlRFckw5a05KM2VhZnFuYTJoZmMtVVh2d2o4T19hb1pVUkZpZGgwTlhwS1V4aE96ZWhiVDl3SkpGSUw4blQ0?oc=5" rel="noopener">Salió a correr y encontró a un hombre que abusaba de una niña en Puerto Iguazú</a><span class="medio">La Nación · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMi3AFBVV95cUxNMDRkME9mM2VqX29qOGNpbGxWZ2JNRzRaT1lJTGpZZ1dTdjNtTHBQbkdKcUl2TUotY0lJOXRRdVBRalFaSWNRWVhqSE9FeEd0TlYwMG9nTlBHc1ZFc0NUMklhS2tIaEVqUHRST3pQSF9zTDdSam9nZnlMYk81MGZ1VXNJbzI1bmpGNjF2RWU1U2paNjRjR2l2bV9kaWJwNHp4NDM4X2k0WUxCM2NoQmFlNDY5RFVKSlJqc0JzNUZBR2prTGRmRDQxNEFBTFB4Q0ZwLTFrRHJSSG1KYnQt0gHwAUFVX3lxTE5LVmV1eGFtVG1QUVZ4dDNxZFd4cDlWUUpUUkcwMDFyeVlOVWswQ00weG9WdGl6bTlweTZOcEJiNHdIY0RmS2xMWngxemtILXR3Rmo4U1VJVUphbW5IRW16REluZWJuekNMb1ZiOWV0dW9Kb1doWDh6YTdkM203d1h0Z254aWtEWXdsS3RsVGVFOWRaaGNURDliSXQ0U3l3NmhNOHJLU19yLWlWalRtaFJETVJwMXhHV0RFUTVHWHo3V2czQU5rdDdDTmx6ZTNKbThIQ19nQ1FwWHQzYW9JVnd3UzlfaXpvb2xQc19TZ28xMQ?oc=5" rel="noopener">Salió antes del trabajo, encontró a su pareja con otro hombre en la cama y lo mató frente a sus hijos</a><span class="medio">TN · AR</span></li></ul></details>
+</article>
+<article class="tema" id="t5">
+  <div class="tema__cab">
+    <span class="n">05</span>
+    <h3>Fátima Báñez</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, MX"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#DA4769;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">6.43</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.08</span><span class="tag tag--ojo" title="Tema sensible: pasa por lectura atenta en el punto 3">sensible</span><span class="tag tag--ojo" title="Tema de España: resta puntaje">España</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/F%C3%A1tima_B%C3%A1%C3%B1ez">Wikipedia</a> ×180.7 · 151.816 vistas · Prensa 5 medios en AR/MX<span class="fuentes">fuente: Wikipedia, prensa</span></p>
+  <details class="titulares"><summary>6 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxOS2ctYUE2aGRHbXhkZWZSN3h5c3RQVjZsVWlxdjVDajc3VnotUGVWTVBId3ItUlZwNU9ISnVGX09XbmtiUWJJVVZ4VEcyYUJiRXBBS3E2OHhkSUxzRC0xVkdhVktMZzFYMGhaVU11RjBSbWpWUWNsbkgtbUVwWkZpY3VLbktWLTNKWFNLNkZZN3IyNHpzUzNGUWYxVW5CM1MwSjZqWEU0ODJhcmtFMTk2U1VROGZLQ3pCSUN2ZVFYbTA?oc=5" rel="noopener">Murió Fátima Báñez, exministra de Trabajo de España, en el choque de trenes</a><span class="medio">La Nación · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxNRTQxdWNGOEdMdUU1RHgtOW5OWXpQSmNzaGRHTnhLVDZsSER1MW84NGRFcHJETENwVWh6UnVMNTVFTFdKVEtFZ3RjdDdtWUEzTFA3azhteFNiYm5ZdFZXRjFlYzFPR1BGVURqdWFCV1hwclVQNWdXaml3b200cXhJVVhzM09RWnJ0czV6ZndkUmpxdDkxQmRuOGhDdVd3MEo40gGgAUFVX3lxTE45RE1wRHpkT1RQS3BZMmZGZkJjUUp0VExQOHNMbUtSejc3YmNNWDlSMUwtZm1wNkc3UXd2ajNMU0VZSm8tZHUyYklMYUNmd1RmT3JPMlVrQWNKSDBpSVZtYl80RlZNdVJYelZCWmtLYnROZ3JZdTBmWUpidHVteEVkMlRXQjJ5R3ZrNGpyWkFyY2FaOVRRcndLOS0ySlNIT2E?oc=5" rel="noopener">¿Quién era Fátima Báñez, exministra de Empleo que murió en el choque de trenes en Toledo, España? Perfil y men</a><span class="medio">Milenio · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMi8gFBVV95cUxQV0hrWGZhZi1fcldTdEt5b1B1Wmp6VEZkVGdsTWg3RHNoQ2twUEs4eWhWc2lYSkRMNjI3ZVE4WGxyOGs3UkM5NTZ2c2xOUmo2Qmo2R210MFBXTFNUdVNCWGlzYTVsOGhQbDY3SFc5VF9Vc0tneWtQNHl2LURDb04waWJISGliUV82Vk43WFIxdDFudEN1Z0pkeXRtN2FQOHVEZUhld1htNTdqZzh4S2pRS2RwX3A2QUI5OEFNd0hjWlAxUXZRdmZndjlVekJCNFBHUlRTOER4LTBRakE2WXZNUk5IaTdVS0lsVUlMWllXNXNRUdIBhgJBVV95cUxNcTd2V3dndTVVRl9jdkxzaGhEZTBORFc3blJPTTRzcmUzRUVWdzdCQ0RuTlAyMy1ETW1vYmhrNVVGMkwtMzR3U3ctUWhPU1lfUGR0U005bUtUMDdyZFRNWHFuZzlmdU8yX3JTdHBFUHl3dUxxQVFKZjRlem9GX2dad0dwNW1fRzF4b0JZdTk1VTZuUHZyRUhJSTJwWm9UUEZOZUNjd201bl95SW1oa29mbVlpOGpMRXJiOEhJVXdqeWk0SHZlb29rbnR0cEYxUjMxdmRObENYOXBvbzJCTThGY3Z0UkpOdDdZLWRXRnJjeEltcG5tN1dSamhhcTAwMWlzRU0wT0JB?oc=5" rel="noopener">Choque de trenes en España: recuperaron las cajas negras y estiman que uno circulaba a más de 160 kilómetros por hora</a><span class="medio">TN · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMi4gFBVV95cUxNd2JZSEVYQlRJeVk2c1VQd1M3aUtZcGJIdkZ0MllNMUI2NEtudWJnak1OXzV3MjV6elkxV1haNlBtUGc5OG1oLXdLOU9CQXVRSTFqM0tTTXFIeWtGTERrSW9BUmN4Vk1hWVNRMXFKcWtfNjljd2JEQVo2NWllM1pkS2NNbmNoX3BXb1RPT01oWk8wQS1SVGY2cG9fWS14VlhPR2lQQnc1NXA1eE9sSDRpYjJKT1ZXei1HMWRHTEpxQzlGaUU2NG9OQ09kUXlzUHVpejBVRm9iTDlSTzVxS0tKTmJR?oc=5" rel="noopener">Choque de trenes en España: crece la angustia por los desaparecidos y se multiplican las críticas a Pedro Sánchez</a><span class="medio">La Nación · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMiggJBVV95cUxNaW5IZ25VWDc3TFFOV2lTLTFCSXlycVEyc2ZqQWpFV1o3RHFSeENXVEVKUElKajJmSXRyTEZOeC10SFltWE1zdUxKeUtUMzN4RzIxM0lsNFBuZ2R1NHNIVzNWcjhFS1VjdzlRZXJxdHJKS0tpQ1UxU2ZOZ2RManJpdmk2c3BwM0IwTU5mVEJhSHU2LXkyaXMtNmRVNWpIM054b21oZ2JWa2ItREVwWDdIUVdwamE1QXY0TUlRNE9jUXhFYkVQS1Q4c2RRY2gyU09NbWhkWGFxYjhObDNpNlRHdUVNWVNMczZPdVJLWFJ4RWwzQkpmVU1XcTFTdEVjb1ZjbXfSAZwCQVVfeXFMTzBOUHJETC1yUXhBRmFoX3lISXdxY1VDcHpaRFJXZWZVaWwwNFdGTFVuYklIb2g3NV9MdXVuWXJVS1VOczFFaHcyR0EyZFRmbE83WXNkZ3pabWZMR19yNk01aEJ4bzhMcTdxbjhvczZyUEtDNVZLVUJLZHVobkNfVThudGdYSzhXemxYbUVYdWsyZ1oycmpZT2ZsTzc3YVBqb0pYZFZXdDlTSXRVenRlMDlQRUQ2NHNucHRBLTVQNmZUam5lR3ItU0dvVnp1cnFrTzRSRHlJQURZbGdvNmFQcjBNX3RHdVdOTEhpa244RjJfTGo1Vk1WTmhwWVlRclZZc294QlVvX19walVsNnloNzV1WVBFeTB1TUhESjY?oc=5" rel="noopener">Un loro dio una pista y una prueba de ADN identificó al autor: quedó firme la condena al femicida de Elizabeth Toledo</a><span class="medio">Infobae · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMilgJBVV95cUxNZjV0YTV4T2cxdzFyRDBFTTVsTFJ2SEQxYWtZSmZTLWREa3paakN3aDlTYUxfcGdrRVpTNXpuZUpiNzBhbmlvYU5Bck01cjV1dnlaN3ZoRENaVlRNa0RpODVKLUpBMEYwRUIzZG1EcWF5OFZUMnA2a2l5aHR6WVZrMGxLbFhfNW5hNk5LSzRSYzlRdG5YYmVDS3ZUa2g2blJYZkg2UUVGM1FsdXY2bWplV1FZazd2U3Rqb1BEZUNpdmZGVFJtdjhDMVRNTE55NFpOSWFncmF5b0JUMDZaTnVEdjFhTFdmZlF3Sk54SmVwVDR4czlqa29jNHZUYkg2Q2M1cUN4UlpkeHk4Slp3ZDFtUDYxbjZud9IBlgJBVV95cUxNZjV0YTV4T2cxdzFyRDBFTTVsTFJ2SEQxYWtZSmZTLWREa3paakN3aDlTYUxfcGdrRVpTNXpuZUpiNzBhbmlvYU5Bck01cjV1dnlaN3ZoRENaVlRNa0RpODVKLUpBMEYwRUIzZG1EcWF5OFZUMnA2a2l5aHR6WVZrMGxLbFhfNW5hNk5LSzRSYzlRdG5YYmVDS3ZUa2g2blJYZkg2UUVGM1FsdXY2bWplV1FZazd2U3Rqb1BEZUNpdmZGVFJtdjhDMVRNTE55NFpOSWFncmF5b0JUMDZaTnVEdjFhTFdmZlF3Sk54SmVwVDR4czlqa29jNHZUYkg2Q2M1cUN4UlpkeHk4Slp3ZDFtUDYxbjZudw?oc=5" rel="noopener">Protesta por el choque de trenes en España: exigieron la renuncia del ministro de Transporte y apuntaron co...</a><span class="medio">Rosario3 · AR</span></li></ul></details>
+</article>
+<article class="tema" id="t6">
+  <div class="tema__cab">
+    <span class="n">06</span>
+    <h3>Emiliano García-Page</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: MX"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#AE3677;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">5.87</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.09</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Emiliano_Garc%C3%ADa-Page">Wikipedia</a> ×5.6 · 4.703 vistas · Prensa 3 medios en MX<span class="fuentes">fuente: Wikipedia, prensa</span></p>
+  <details class="titulares"><summary>3 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMi6wFBVV95cUxOeGl4cDNrb2lZQnh2YVZCemF3SmM5WHF5cWpxektkc2drRHpRbEtFd0tNd2ltbGtTV3RWM01MbTRUTms1MkZvSEhlbDNQUEtjVXN1Rk1GYjVENWFubFpnbGplNk9kWGFOakZLbG9aSGFsOFJVYnJIMTFqS1RyQUZ5WFl5WVpMaDFwNGc2NHlGN2o5MHcwckxaa1dWTmpJdjhwTmhENE1uYXkxSGM2VjZOYzFid3hzajFuek5BZGhocHFBNkl6Q3JlVjRLdHc0S1M2bVFyb3JNVXBQeGltNmQ0MjBDUGFmQTh5S080?oc=5" rel="noopener">Algo pasó ayer en la visita de Omar García Harfuch, pero Graciela no lo acompañó a reunión de seguridad</a><span class="medio">Debate · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMilgFBVV95cUxQR3dWeWlua05CNEQ0OXUxeUlWQWZpZjhRdmdBclpHaktaQmlXYV9ybmdkYUhvLUQyOUdiUXRnVEY1YjA5V29iOTNXTjlaTXl0a0J1YzlHSHI1Nld3SmZrU2xvYUJwZjFWOG5VakVZLUpjclRESUR2MnduX3F4V3FjcmQ5eklITnRDVHVEaHp1bml4NUpxY2c?oc=5" rel="noopener">Va la FGR contra Samuel García, escribe Salvador García Soto</a><span class="medio">El Universal · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMif0FVX3lxTE14ejJISnZmeWpEX0ZDVUFkUFZ2LUQ1ZU9fRFlZNXBvU0RlNHliaEsxOWl5TFNpM1pzZ0FHUnZJSVFjVVZPOUdYMEo3RFhlOEZFSkc0UFdyVGE3LVV2ZVpqakRyOTNqeWlWc2dVUVdLN1JxX09Tc015WjJicVpsOUE?oc=5" rel="noopener">Ahora Samuel apuesta por Space X de Musk</a><span class="medio">El Norte · MX</span></li></ul></details>
+</article>
+<article class="tema tema--elegido" id="t8">
+  <div class="tema__cab">
+    <span class="n">08</span>
+    <h3>Súper Balón de Oro</h3>
+    <span class="chip chip--ardiendo">ardiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, CL"><span class="pais pais--on" title="Chile">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#80257E;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">5.29</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Cambio de puntaje contra el radar anterior · fuente: data/radar">Δ -1.54</span><span class="tag" title="Días seguidos en el radar">3 días</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.07</span><span class="tag tag--ojo" title="Tema sensible: pasa por lectura atenta en el punto 3">sensible</span></div>
+  <p class="decision decision--si"><b>elegido</b> · <span class="chip chip--pub" title="publicadas/2026-10/27-harry-kane-gana-el-balon-de-oro-2026-73-goles-y-lo">publicada</span> <span class="ruta" title="publicadas/2026-10/27-harry-kane-gana-el-balon-de-oro-2026-73-goles-y-lo/meta.json">Harry Kane gana el Balón de Oro 2026: 73 goles y lo que se sabe de la gala</span> <a href="https://youtube.com/shorts/nZdqloJMKCA" rel="noopener">ver</a></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/S%C3%BAper_Bal%C3%B3n_de_Oro">Wikipedia</a> ×4.0 · 7.289 vistas · Prensa 4 medios en AR/CL<span class="fuentes">fuente: Wikipedia, prensa</span></p>
+  <details class="titulares"><summary>4 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMi1gFBVV95cUxOOG1ZbC03QkJYN0RVVHNXb1RYSWE1MjB2NDJDTE1wMk16d0lDd3cwbzl2LWVGaUJLZ3ZrMDBudF9WdjBMRHktSVFpZ1hpVTJubDNFa3FucEo2OTYtUFhwQTF1M3JvcUFCX3hyc2JmT01nTy1YSmZ2RTVnUUhMa004U2o5YmJLZXQ0TlU0MmdzOG1COUp1a1NQb3V5MjA4QjlsZkc5dm1mYkhCbjFqdnZBVUpBNlhjUElIT3VHaDlNb1dFcFU4TEMxcnNwOURMamZmeFlLT2lB?oc=5" rel="noopener">“Súper Niño”: un especialista en Ciencias Ambientales explicó qué impacto tendrá y cuándo se intensificará en la Argentina</a><span class="medio">La Nación · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxQM2dkWk1RaDQxWDBVcmJ0OWpqbHZXc0V2Yzg3b24xMkJ6MExocjZMd2l3M3lxcFZBSFVOclZwVVduX084Q25EcjBrVTVnd01nWG9TbkhVeU9UZlo3dU9JV2hBcFFLdEo5VnlZSm9OVjZIRWlieUZGMEI3X2lrQTctRHFsQzdOUFExNnFKVTlzOWdhWFBIM0YtYzFKdGZQOVRXNVJ1V3RSc21maDVrN1lUREFYM3dYejJobDRyV29LQ3J0VXBEMFNJ0gHMAUFVX3lxTE9seFFKMERsMTAyZGN0OVBBYXJNZFVBMVFaRDEwbnp1SGRTd0ttLXNQM0xtZ2lWTkxGTGRZd2ZZcU8zVnE3c2Q4X2ZCUjYyUDNZaEU4cG9nRjIxbFQ4bTVGMVNKUXBXd2JQT0hpSWV5U3hweDk0MEFISXBJMXl0dGV4UzJGclQ2blFPQ0lLb0FtWHIxNHEwYldhWXhBNGE3bTBLaTVaaE1maFdpTy1WWXE4NkNRRXNWTjlCQVZrUF81Y0N3R3ZMcWlIdWhfZQ?oc=5" rel="noopener">Advierten que el Súper Niño podría provocar más de 370.000 muertes por calor extremo</a><span class="medio">Ambito · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxONW1vdVB2TTJKWmVUTmU1OUxBMlV4cDhxOE1YUEpfM19LNmhURVdIRzB2d0pyMVZoQlh2cGFDX0lRdmZGdXZDTGZpVGJXTVlWcGxmM2tWZ2NvSUgtT3pRUTFPS0RLOV9feFBwbVVTYlBRNXBVOU85ZzEzRmNRZXRSWko4cTkxcUsxQ1NhXzg3eUFYTWpEOXd2X0xpZ25sbVYtelZHQjZlQUZtUVB3SzFDTEV4QXpjclp4d2hUMVFGak9yRS1QWDVV0gHoAUFVX3lxTE1XUTFET29uOHlKVkV1SlNZNWRob2dJRWk2T3RYbk1Ob2hrYjh3NWV2Q1JDMWhKVmJMNUdGOHJNdmdYZnJBOWRVRk5OMmRxdEdZd0x4UnJuT25OSUVHTlNobVJXTUVXS19ibW1KaUFIUE9jVU02M2I2akVwS0F4d3JhNkRRb0JmVTc0MVpXNDQ5N0phMGlYMVlCWVdvWHBKQzZxcHpFNG56LXduRExrZElLLUJoSTNBdFRvQXB2S1lKU2R5UHo0T3Q4UjNHTnNWdG81d2JFTjNwWVhWR0tDWmNqQVVOSmx1MjQ?oc=5" rel="noopener">¿Hasta cuándo lloverá en Chile? Lo que viene para los próximos meses con el Súper Niño</a><span class="medio">La Tercera · CL</span></li><li><a href="https://news.google.com/rss/articles/CBMisAFBVV95cUxONm91ci01TGg4a05OM1JzNzd5czZtSWZjclR1QWFxdEdKeXNoUUR2SXRjZldlTGZTdXM2UHcxSEZvY2t1YVg5MTh0MlA4RXZnM3c4NjlZaktpZDJpTklhQ3Zfc2Ztandrb0hwek4wQ1BxU25wYXA5LVpWYnZfcjZCbU84UkQ4dHlSMHNkWUFjeTdPS1QxejR5cGJ5ZENUN0NzUjhGZlA5OUJ2azRBNEdfUNIBtgFBVV95cUxNNThkbGdkckpPUHNUbC1kR0VhdG54WHFGZVVtel9haWRhN3d3ZzNWRUIxdzlXUU56UmxaRl9MSUVic25lWjA4a0hBQ0tSc2JObDk0Q2NsVjZVbGlDbWxxTHpuUFRYTUxIOEE5cjR2V2tWSFRZamFEcWV4M1hpbzEwMzZ0Y2h4dV9URzlpN3Q0Z0JIVkFhMUI3YUJiLVdpVmZLa0hHY25pTnczSWd3TFpxcXBSRHNIUQ?oc=5" rel="noopener">EE.UU. proyecta posibles muertes por Fenómeno del &quot;Súper Niño&quot;: incluye a Chile</a><span class="medio">24horas · CL</span></li></ul></details>
+</article>
+<article class="tema tema--elegido" id="t11">
+  <div class="tema__cab">
+    <span class="n">11</span>
+    <h3>Elecciones parlamentarias de Israel de 2026</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, CL, MX"><span class="pais pais--on" title="Chile">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#601B78;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.88</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Cambio de puntaje contra el radar anterior · fuente: data/radar">Δ -1.81</span><span class="tag" title="Días seguidos en el radar">4 días</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.04</span><span class="tag tag--ojo" title="Tema sensible: pasa por lectura atenta en el punto 3">sensible</span></div>
+  <p class="decision decision--si"><b>elegido</b> · <span class="chip chip--proceso" title="contenido/2026-10-25-elecciones-en-israel-2026-netanyahu-vs-gadi-eisenk">guion aprobado</span> <span class="ruta" title="contenido/2026-10-25-elecciones-en-israel-2026-netanyahu-vs-gadi-eisenk/meta.json">Elecciones en Israel 2026: Netanyahu vs Gadi Eisenkot</span></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Elecciones_parlamentarias_de_Israel_de_2026">Wikipedia</a> ×2.0 · 17.625 vistas · Prensa 3 medios en AR/CL/MX<span class="fuentes">fuente: Wikipedia, prensa</span></p>
+  <details class="titulares"><summary>4 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMijgJBVV95cUxPdE9KelR4NUFlcUgyRWFxT1R1TFlQaVNiQjV6VnRQbnk1dUZ1SHl3aVZjRmpCOURVaXE0ZzM5bjZmUEdpZUxWQldpTlQxeFR5WmljN21GRjI4WGhWV2M5bXJRWldaSHdhd3M3eWp1WmFLTXNIR3gyV2FCZTA4aHRLU2lrX2pOMGd2dXA3RFphNWVtNDY3Q3pNc2pJSDBReVltZGNnd1dFS3dIemswRC1hM0hGSnJTTmowQUlTZmlNaEdzbFFDOUNHNndSQjJKb19WR21oTGhlRExMTGJZSEp5NVg5YUprcGZQNmptTlJuR0wzVGtoV2NCTXBrcG01Y2RJVHdiMVZEb0tiLXk2aFE?oc=5" rel="noopener">Exdiputado chileno Daniel Farcas apareció compitiendo en las elecciones parlamentarias de Israel</a><span class="medio">BioBioChile · CL</span></li><li><a href="https://news.google.com/rss/articles/CBMiXEFVX3lxTFBXNnFaVC1MZUt6SmxBT0ktdEtxMWhHVnFqZmxnN0UwX2xLaXJSMDhGbi10WWJQSmV6MWpNT0Z5U2tqLVFIcG9uQVBJY2Z5NnRCT1BrOS1pY29LM1dh?oc=5" rel="noopener">La oposición condena a Netanyahu por acusar a Qatar de interferir en las elecciones de Israel a favor de los partidos árabes</a><span class="medio">BBC · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMiW0FVX3lxTFB2d1JjbDVmVjZIQXc4emlwVmU3eWRZLTB2YTlDOUtSN1BPQi1nUTNBbnotZ2JlYVdQckpUTDdKbERqeWZld2ZtV0I4dzgwZ0lSRVFTY0FSTy14U3M?oc=5" rel="noopener">Cómo Israel encontró en la nueva derecha de América Latina una aliada clave en medio de una pérdida de apoyo internacional</a><span class="medio">BBC · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMi7AFBVV95cUxNRUk5UDFRQXlJRERsVWpDMDFWbC04eU9ndTFTUGdBU2hiRWxVNGNqUzVGcTBBQUMxU3NVblVvLTJBSENXR1FVNTM5d05vakFnbV9MUWluWWxKMDdQR2hSbzMxX1dEZkRyeDJGS2tuQk1MX2p6TVZyWmFwTFNXd1J2Mzg0UzNvdVVodERDNjFCbHZRZ2FhZ0dpX3ZiSjZjN2hOZGZTZWdBUzh4eWRIQXdPdWhDelVmZno2eEZtYXJKdjUwTTBMYThGN3pUS1JGSG1xNFBLaTc5Uml6Z3ZJMmV6aGppTEQ0Zm1YTmIxbNIBjgJBVV95cUxPdEV3WU45a1VIMEJQQ3AxREI3SXA4dkJObzVGdlhiZmpGQi1WTGZJQ1MxdnJERWwyUE5Cd0ZLLVE2bjUya0Y3SHdVallRdFN6U3ZsUzc1aEpmSDNCSjZsU1E1dnlhMUYxaER3MHJzTzRFa2JkSHRaaVBSTy1FYTB3UWswY3pzWmpuZ1poNjAwUHhXMlJBN0dJQVJCMXFtRXJnMXU4WmtKMDZlME5sbW1UMTZieWZ1NW5HUjlLR0k4U2FiYXRTUEMyY2FsS3ZMRXdLc3A0SUxJbXB2UU1ZZEg3WU14Znk1dUNnVzNJcllNMGhDZEZ3M2lCZDI1VUl0SGJoalprdTIwYXVtVU9IRnc?oc=5" rel="noopener">La reacción de Daniel Garnero tras los cánticos de los hinchas de la UC contra los jugadores y la dirigencia</a><span class="medio">La Tercera · CL</span></li></ul></details>
+</article>
+<article class="tema" id="t12">
+  <div class="tema__cab">
+    <span class="n">12</span>
+    <h3>incremento salario mínimo 2027</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: CO"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais pais--on" title="Colombia">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#5A1977;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.80</span></div>
+  <div class="tema__tags"><span class="tag">otro</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.07</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal">Google 20.000+ en CO<span class="fuentes">fuente: Google Trends</span></p>
+  <details class="titulares"><summary>3 titulares</summary><ul><li><a href="https://www.eltiempo.com/economia/sectores/salario-minimo-2027-gobierno-de-la-espriella-evalua-adelantar-el-inicio-de-negociaciones-esta-seria-la-nueva-fecha-3597298" rel="noopener">Salario mínimo 2027: Gobierno De La Espriella evalúa adelantar el inicio de las negociaciones; esta sería la nueva fecha</a><span class="medio">El Tiempo · Google Trends</span></li><li><a href="https://www.larepublica.co/economia/de-cada-10-trabajadores-y-trabajadoras-domesticas-ocho-ganan-menos-de-un-minimo-4514513" rel="noopener">De cada 10 trabajadores y trabajadoras domésticas, ocho ganan menos de un mínimo</a><span class="medio">LaRepublica.co · Google Trends</span></li><li><a href="https://colombia.as.com/actualidad/el-grupo-aval-propiedad-de-luis-carlos-sarmiento-93-anos-revela-cual-seria-el-aumento-del-salario-minimo-en-colombia-en-2027-f202610-n/" rel="noopener">El Grupo Aval, propiedad de Luis Carlos Sarmiento (93 años), revela cuál sería el aumento del Salario Mínimo e</a><span class="medio">AS Colombia · Google Trends</span></li></ul></details>
+</article>
+<article class="tema tema--elegido" id="t13">
+  <div class="tema__cab">
+    <span class="n">13</span>
+    <h3>Urda</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#591976;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.79</span></div>
+  <div class="tema__tags"><span class="tag">otro</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.06</span></div>
+  <p class="decision decision--si"><b>elegido</b> · <span class="chip chip--pub" title="publicadas/2026-10/29-choque-de-trenes-en-urda-toledo-el-ave-que-alcanzo">publicada</span> <span class="ruta" title="publicadas/2026-10/29-choque-de-trenes-en-urda-toledo-el-ave-que-alcanzo/meta.json">Choque de trenes en Urda (Toledo): el AVE que alcanzó a un Iryo con el sistema LZB caído</span> <a href="https://youtube.com/shorts/02a7kayy9R0" rel="noopener">ver</a></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Urda">Wikipedia</a> ×38.7 · 32.478 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t14">
+  <div class="tema__cab">
+    <span class="n">14</span>
+    <h3>LZB</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#591976;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.79</span></div>
+  <div class="tema__tags"><span class="tag">otro</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.06</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/LZB">Wikipedia</a> ×17.9 · 15.037 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t15">
+  <div class="tema__cab">
+    <span class="n">15</span>
+    <h3>Demencia con cuerpos de Lewy</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#591976;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.79</span></div>
+  <div class="tema__tags"><span class="tag">otro</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.06</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Demencia_con_cuerpos_de_Lewy">Wikipedia</a> ×13.0 · 10.952 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t16">
+  <div class="tema__cab">
+    <span class="n">16</span>
+    <h3>Lázaro Cárdenas Batel</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#511675;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.68</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.11</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/L%C3%A1zaro_C%C3%A1rdenas_Batel">Wikipedia</a> ×17.0 · 14.300 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t17">
+  <div class="tema__cab">
+    <span class="n">17</span>
+    <h3>William Contreras</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#511675;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.68</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.11</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/William_Contreras">Wikipedia</a> ×13.4 · 17.683 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t18">
+  <div class="tema__cab">
+    <span class="n">18</span>
+    <h3>posiciones de fbc melgar contra comerciantes unidos</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: PE"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais pais--on" title="Perú">PE</span></span><span class="puntaje" style="background:#431172;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.50</span></div>
+  <div class="tema__tags"><span class="tag">deporte</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.12</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal">Google 50.000+ en PE<span class="fuentes">fuente: Google Trends</span></p>
+  <details class="titulares"><summary>3 titulares</summary><ul><li><a href="https://rpp.pe/futbol/descentralizado/melgar-vs-comerciantes-unidos-en-vivo-a-que-hora-canal-y-donde-ver-fecha-14-torneo-clausura-2026-via-l1max-partidos-de-hoy-noticia-1714896" rel="noopener">Melgar empató 1-1 ante Comerciantes Unidos y dejó escapar la chance de ser líder del Torneo Clausura</a><span class="medio">RPP Noticias · Google Trends</span></li><li><a href="https://ovacion.pe/noticias/liga1-2026/video-fotos-comerciantes-unidos-rescato-empate-ante-melgar-arequipa" rel="noopener">(VIDEO | FOTOS) Comerciantes Unidos rescató empate ante Melgar en Arequipa</a><span class="medio">ovacion.pe · Google Trends</span></li><li><a href="https://www.sportytrader.com/es/pronosticos/melgar-comerciantes-unidos-383040/" rel="noopener">Pronóstico Melgar Comerciantes Unidos - Liga 1 Perú 29/10/26</a><span class="medio">SportyTrader · Google Trends</span></li></ul></details>
+</article>
+<article class="tema" id="t19">
+  <div class="tema__cab">
+    <span class="n">19</span>
+    <h3>Amalia Solórzano</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#3B0F70;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.40</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.11</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Amalia_Sol%C3%B3rzano">Wikipedia</a> ×9.1 · 7.641 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t20">
+  <div class="tema__cab">
+    <span class="n">20</span>
+    <h3>Willson Contreras</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#3A0F6F;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.38</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.11</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Willson_Contreras">Wikipedia</a> ×9.0 · 7.545 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t21">
+  <div class="tema__cab">
+    <span class="n">21</span>
+    <h3>Ian McKellen</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#3A0F6E;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.35</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.11</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Ian_McKellen">Wikipedia</a> ×14.7 · 12.308 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t22">
+  <div class="tema__cab">
+    <span class="n">22</span>
+    <h3>Horacio Pietragalla Corti</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#380F6A;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.26</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.11</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Horacio_Pietragalla_Corti">Wikipedia</a> ×8.2 · 6.864 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t23">
+  <div class="tema__cab">
+    <span class="n">23</span>
+    <h3>Inundaciones de la DANA de 2024 en España</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#340E64;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.11</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.10</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Inundaciones_de_la_DANA_de_2024_en_Espa%C3%B1a">Wikipedia</a> ×4.4 · 3.684 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t24">
+  <div class="tema__cab">
+    <span class="n">24</span>
+    <h3>Inteligencia Artificial</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, MX, PE"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais pais--on" title="México">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais pais--on" title="Perú">PE</span></span><span class="puntaje" style="background:#330E63;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.08</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×0.99</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal">Prensa 4 medios en AR/MX/PE<span class="fuentes">fuente: prensa</span></p>
+  <details class="titulares"><summary>4 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMi1wFBVV95cUxOMG5QWFhLcmp3bW5STUZ4WDBpM2ZpMVFxU2Y4T2RXZ2IwcFRHZXJYNGt0R3BoeUJzd3ZUZ1NZTWJFY216R2RGUzVUUmNPbzFQMDJCU2JPZV9Jbi1hRzhKNDhteWNnUXFXUXRGNktXczVLTVNKQUIzY2JtbEtadDR6Y3o0NUJJR0ZnU1JGdmI3SEJtS0U2ZzZkTXFVRFpXZE5FQzRoUk5JdTJ2Y1pJWHVCQlpFNTdMdzlvU25MVFFkVXgwRG44QXB5Ukw5aGxIU3FDMWFwMXlDVQ?oc=5" rel="noopener">Pronóstico del Apertura 2026: La Inteligencia Artificial dictaminó el resultado entre Cruz Azul y León</a><span class="medio">Vamos Azul · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMi-wFBVV95cUxQelA5eXlSXzFZblhQOWZFSTN4TUFRSmFBcWJ1SHhTSEZJSVhXNGZDMVBXeERlbFJ1MGZRbkl2SmhmZERQbVVNMmtIeWZ6OHFreVFrdEphcENLR2I0NjBUbzloYVpPRXYxcWFxOGtoeU5EZi1kRzRGTTY1S3FSdEFOcHFGekljRDFmN1RYUDBWT092MEU1UDNDOW9DemFPclVISmJlMkxVUDJJOHlSRG5IS1g3bHdvamtMdV9hX3J6ejRXWVR5MmRDT1BWQkRmTnc2V0VsejhtUEpxbHc5bFZ6cDhIQXRCbWEyQUFDbnlaUFdEQTdQM0ZPdWdJONIBjwJBVV95cUxPdWNwUFktakw2OHBocEszVGkzYVp0cmExTmtGRV9pR3B1aGNiVG51b05LRW1rSTFBT2RWVFJ4enZxLXlVM2VkMHNjVWRqY0xqMEE1V0RyOGhHOC1Zdm02Qloza2p3RGlsQ2hqM01DM09hRzRNOTBFS1FIbDNFM3JJXzYtR1FGRDZpN3ZFU2JycWxTd3Q3OFh0MEFaMVplbURQREktdUgzWU5KRnowLVhHN1ZYbEE4UjEtUVE3ZXh5bkx3cGJmMzNUNUpzblQ1cFBfWlJYaHA5OG5LVUhVaHFDN3NfMDJNX0VNRUVzTm5LYzh5WGZydnFseVJSMUxWUXRuVmNhYWg0RDRSdERNRHlF?oc=5" rel="noopener">Oficial de Inteligencia Artificial: ¿qué es y por qué sería clave para transformar el Estado peruano?</a><span class="medio">El Comercio Perú · PE</span></li><li><a href="https://news.google.com/rss/articles/CBMizgFBVV95cUxQazlVYjJpQ1NtWUVqRzF6UE40Tjk4RGppNk55MXlDVGlRVXpUMnhIaENVdWp2cVlzb2I4TExsclQ2R0RzcGFjY3g2Um1vWWZya2ZNSllVOUdwVG1fczlKWVRqRkRndFBGbDd5WlpiWFhJRm9aMGNrSDZKa3g1c3hDaTlVWjNqR2JjME1xbXhsNzBsLTg4WXA4c1M3d0FLS2plNXlDajR4bzdDTUItVXQwN0ktRGlmbG91US1pdy1BVmtjMGR2UV9fOEdmMDFjQdIB0wFBVV95cUxQTEoyYi12cmRIWDFLdC13VGl1YzFCVXJxNlF4MzVqTGNyY2tMRkstVjF4b2k0SjRzcjBVaHFkaGdtdzg2a3dnT21jN25YMkFiLWRreFE2TU53alowZTI1MDh4c0hyRnFjUzdFM1dHeEtLOHF3eFdWOEpNLTJFNEMzLTdETVhZS1ExWFpjRGloT2ZLcFBIdGNuNnFMTC1Dd3VlMnZsdG1MM3BqdGpCQTRPUkVydnNkcVZDSDFkcDBvTmU5UlJmMjZuVUpkZkJsSUswNEtv?oc=5" rel="noopener">La Inteligencia Artificial exige repensar el trabajo, no sólo automatizar tareas</a><span class="medio">El Economista · MX</span></li><li><a href="https://news.google.com/rss/articles/CBMi-gFBVV95cUxNZkdjWk1JMmFZdGZvRWgyVGl4dUJwNTNVLXFMWm10UFhHWmtlUVdVMmNIV2RmbHE0dnF5eVd1dmtqUXlaTkpLYXRZUUVMLTFrSG94d2dLQUwzMWFBWm4zXy1nM0NQSkc3M1VKT2JvVGV4bXFQWE5sUDdWckxqWHlVQktNVlhneEdyZ2RzMUJZbEc2QWxqN0lLdVRFcTVPd285UWxiZTJxaG1Ed1czaWpveXFfR3JiQzB3Mnl1YUZweVJrWjcyWlpWdFBaWjVUb2RpREVSVzN5VHJJdnBaVEZoSmZoVEtFcVhQSW1oUHh0bm1LVDRqd2RBQTB30gH6AUFVX3lxTE1mR2NaTUkyYVl0Zm9FaDJUaXh1QnA1M1UtcUxabXRQWEdaa2VRV1UyY0hXZGZscTR2cXl5V3V2a2pReVpOSkthdFlRRUwtMWtIb3h3Z0tBTDMxYUFabjNfLWczQ1BKRzczVUpPYm9UZXhtcVBYTmxQN1ZyTGpYeVVCS01WWGd4R3JnZHMxQllsRzZBbGo3SUt1VEVxNU93bzlRbGJlMnFobUR3VzNpam95cV9HcmJDMHcyeXVhRnB5UmtaNzJaWlZ0UFpaNVRvZGlERVJXM3lUckl2cFpURmhKZmhUS0VxWFBJbWhQeHRubUtUNGp3ZEFBMHc?oc=5" rel="noopener">Donald Trump anunció que prohibirá el uso del término &quot;Inteligencia Artificial&quot; en documentos oficiales de ...</a><span class="medio">Rosario3 · AR</span></li></ul></details>
+</article>
+<article class="tema" id="t25">
+  <div class="tema__cab">
+    <span class="n">25</span>
+    <h3>Wall Street</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: AR, CO, PE"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais pais--on" title="Argentina">AR</span><span class="pais pais--on" title="Colombia">CO</span><span class="pais pais--on" title="Perú">PE</span></span><span class="puntaje" style="background:#330E63;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.08</span></div>
+  <div class="tema__tags"><span class="tag">evento</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×0.99</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal">Prensa 4 medios en AR/CO/PE<span class="fuentes">fuente: prensa</span></p>
+  <details class="titulares"><summary>4 titulares</summary><ul><li><a href="https://news.google.com/rss/articles/CBMi8wFBVV95cUxOODBLR1hCc283cEpZWWNSWW1MdktZOG1Nd3haR1pzeGE0R2FELVdCZmlxNFZNWmwzcTdhblAyUHUyNjZNamNwdWRuTmRfWXVzWWs1bjByWVBKWHRyamhBNDcweEVzanJZU0NPR0NucmNYVXhIN0loVXRCRUFFWHZPdTFXTE9oTFJiVnBSZVU5UTJUMVluSi04ckRabGJFS0tuVXREVVpPZDJ2RFdlLXo0RVBGUmE3UlBEa2xVV2FmR1dsRnpLNVNyN29iWXFpRExHN29yRmFvX254WWNMRmhCMHhadHI2Rzd5a1l3RWZaMXNvTG_SAfgBQVVfeXFMT3cwMWRBckF4clFkOG91SmFVZlZKd3NndHI1eGJxWHR4TzJPNXl0MnJRRERPSWpTa1ljTzMzOEtkY19LbmNSZjNSQ1c2UlBiaFFrRUE5aUpMM2plSWZ2VmdESGxTT1pHUVFTQ1NGUVlzSTZ2ZVk5a1dxYzNMOGd5SmhuLVZxWVYzRVlmWnN1MmlGOTZHekJVS0VFOHdUMXVlamVLNUdFZGtlUjhVRXFZNGFGRHpKZkJRU0dSOU93d2NnbVJXM3g1VjdwMkdZLV9BTHoyeXdDd05PTG40YkdSSEkxWkcxWEZDVjRSenFVbkgzTjc2YlQtSDk?oc=5" rel="noopener">Jueves negro para Google en Wall Street: sus acciones perdieron casi medio billón de dólares de capitalización</a><span class="medio">Portafolio.co · CO</span></li><li><a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxOejRyRUxqSzM5S1F1VFZVYW1GeENsLVZxYWRkZTFRMUtoa1ViSzVLWTZlZjVSenpqakhXcUdTVGp0SE54eHBNVENyLUNVZllQVXYtTllrallWa2E2R3JKODh5THF4Z1FkdHpzQ0sydEtGSXZsNEJ3NUlvSkVfNVd0OUpvYnpZWWJYRHdmNHZvX0NGcDVjTTBNWXhDekpBTzhvdlJ0aHljS1RLV3NJOG1Lc0ZGNHJYMlNtRXl3TlFxWFZpSEIy0gHKAUFVX3lxTE9WRHktWTA2U2FaVV9vUjEwR0dfSkp5V2p4b3pOMU1qdURLcVVKWmV3b2NnN1h1cWp0ZVdQTm5FSExyWVRwQ1VrYVpSQWU0TFJ5aGtPeUVFXzFDY29vcmhjSnJOVEs5Z2Rrei1lMmVTckJEUFloaGZmdFBDbDExQkpubllrTDdMcDUtN1VmQnV0bDB0ZkNxWS1NQ0dZZ2x3U0dvbUkzemhKcG5ma0tLWlM0RXZVbVNVTkthMHFvNXhxZDJEdGd3MnVrMmc?oc=5" rel="noopener">Wall Street en rojo: el Nasdaq perdió más del 1% tras los decepcionantes resultados de Alphabet</a><span class="medio">Ambito · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE90aFVVY3o3b3pGX1AyVThxQ0JkYzJ1TDZyWUxQdkxuNW9uRXBXVTVuQmdvYXYtNzR5ZkhlMHpyV3J2M2VxY0xQbDh3YXh4VDN5Q1dkNURxMTM1R3dqR2xNbTRNWUY4a1RnWkZuWU9GU1RsX0dteTg4?oc=5" rel="noopener">El Nasdaq cae mientras Alphabet se encamina hacia unas pérdidas récord debido a los problemas relacionados con el gasto en inteligencia artificial</a><span class="medio">TradingView · AR</span></li><li><a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxQMFNFdlNUY09oSnJTYkVKS0FKMDU3ajlGRGl5UWFGTVNwNmJ6c2p1WWdOZFFXYjYyaE1NbnQ4bXpXRWI0R3owWEkzaW1XYkh4bm1MVXRQb1YxM0xIQkFpR0U4N1puWFhwRk8zUmtnSE1zaFJ3RWhtM1JmakZXc2ltc3IxSmVnRE5ya3lUTm9DZWVFV1I0YjFtT2tETmdsR2FhMHoxYnFtQ1h0S2FENk84aHdBM0sya0F4VzF6UDgybld1SzVf?oc=5" rel="noopener">Wall Street encadena tres jornadas de ganancias tras la decisión de la FED y el impulso de la inteligencia artificial</a><span class="medio">Comercio TV · PE</span></li></ul></details>
+</article>
+<article class="tema" id="t26">
+  <div class="tema__cab">
+    <span class="n">26</span>
+    <h3>Milwaukee Brewers</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#330E63;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.08</span></div>
+  <div class="tema__tags"><span class="tag">organización</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.12</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Milwaukee_Brewers">Wikipedia</a> ×5.0 · 10.116 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t27">
+  <div class="tema__cab">
+    <span class="n">27</span>
+    <h3>Adif</h3>
+    <span class="chip chip--caliente">caliente</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#320E61;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">4.03</span></div>
+  <div class="tema__tags"><span class="tag">otro</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.06</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Adif">Wikipedia</a> ×6.3 · 5.256 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t28">
+  <div class="tema__cab">
+    <span class="n">28</span>
+    <h3>Charles Xavier</h3>
+    <span class="chip chip--subiendo">subiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#310E5F;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">3.98</span></div>
+  <div class="tema__tags"><span class="tag">persona</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.11</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Charles_Xavier">Wikipedia</a> ×6.7 · 5.636 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t29">
+  <div class="tema__cab">
+    <span class="n">29</span>
+    <h3>Ricardo Pashkus</h3>
+    <span class="chip chip--subiendo">subiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#2E0E5A;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">3.88</span></div>
+  <div class="tema__tags"><span class="tag">otro</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.06</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Ricardo_Pashkus">Wikipedia</a> ×5.6 · 4.717 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article>
+<article class="tema" id="t30">
+  <div class="tema__cab">
+    <span class="n">30</span>
+    <h3>Melody (cantante española)</h3>
+    <span class="chip chip--subiendo">subiendo</span>
+  </div>
+  <div class="tema__meta"><span class="mercados" aria-label="Mercados: ninguno"><span class="pais" title="Chile (no aparece)">CL</span><span class="pais" title="México (no aparece)">MX</span><span class="pais" title="Argentina (no aparece)">AR</span><span class="pais" title="Colombia (no aparece)">CO</span><span class="pais" title="Perú (no aparece)">PE</span></span><span class="puntaje" style="background:#2E0E5A;color:#FFFFFF" title="Puntaje del radar · fuente: data/radar/2026-10-30.json">3.88</span></div>
+  <div class="tema__tags"><span class="tag">otro</span><span class="tag" title="Primer día en el radar (bono +0.5)">nuevo</span><span class="tag" title="Ajuste aprendido (data/aprendizaje/pesos.json): multiplica el puntaje">×1.06</span></div>
+  <p class="decision decision--no"><b>descartado</b></p>
+  <p class="senal"><a href="https://es.wikipedia.org/wiki/Melody_%28cantante_espa%C3%B1ola%29">Wikipedia</a> ×5.6 · 4.701 vistas<span class="fuentes">fuente: Wikipedia</span></p>
+  
+</article></section>
+</section>
+<section class="panel" id="resultados" role="tabpanel">
+<h1>Resultados<small>la señal con que se eligió cada pieza, junto a lo que pasó de verdad</small></h1>
+<p class="actualizado">snapshot 2026-10-30 · fuente: data/metricas/2026-10-30.csv · señal: meta.json de cada pieza · r: data/aprendizaje/pesos.json</p>
+<p class="nota">últimos 14 días (32 piezas). Toca una cabecera para ordenar. "¿Acertamos?" es r, el rendimiento relativo a la media del canal (0,6·vistas + 0,4·% visto); 32 con r.</p>
+<div class="tabla-envuelta"><table class="tabla" id="tabla-resultados">
+<thead><tr>
+  <th data-orden="texto">Pieza</th><th data-orden="fecha">Pub.</th><th>Señal al elegirla</th>
+  <th data-orden="vistas" class="num">Vistas</th><th class="num">+24 h</th><th data-orden="pct" class="num">% visto</th><th class="num">Subs</th><th data-orden="r">¿Acertamos?</th>
+</tr></thead>
+<tbody><tr data-fecha="2026-10-29T14:33" data-vistas="48.0" data-pct="-1" data-r="1.2995925896986091">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/02a7kayy9R0" rel="noopener">Choque de trenes en España, ¿qué falló?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/29-choque-de-trenes-en-urda-toledo-el-ave-que-alcanzo/meta.json">choque-de-trenes-en-urda-toledo-el-ave-que-alcanzo</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/29-choque-de-trenes-en-urda-toledo-el-ave-que-alcanzo/meta.json (historial)">29-oct</span> <span class="tag" title="Un Short se asienta a las 48 h">&lt;48 h</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/29-choque-de-trenes-en-urda-toledo-el-ave-que-alcanzo/meta.json">8,32</span> · <span class="dato" title="fuente: publicadas/2026-10/29-choque-de-trenes-en-urda-toledo-el-ave-que-alcanzo/meta.json">4</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">48</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">48</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="c-r"><span class="chip chip--caliente" title="r = 1.30: sobre la media">sí · 1.30</span></td>
+</tr><tr data-fecha="2026-10-29T14:33" data-vistas="2.0" data-pct="-1" data-r="0.36685876529243594">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/4cyVIbKR07E" rel="noopener">Flávio Bolsonaro se declaró presidente y lo borró</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/29-flavio-bolsonaro-se-declaro-presidente-de-brasil-d/meta.json">flavio-bolsonaro-se-declaro-presidente-de-brasil-d</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/29-flavio-bolsonaro-se-declaro-presidente-de-brasil-d/meta.json (historial)">29-oct</span> <span class="tag" title="Un Short se asienta a las 48 h">&lt;48 h</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/29-flavio-bolsonaro-se-declaro-presidente-de-brasil-d/meta.json">6,13</span> · <span class="dato" title="fuente: publicadas/2026-10/29-flavio-bolsonaro-se-declaro-presidente-de-brasil-d/meta.json">5</span> merc. · <span class="chip chip--ardiendo">ardiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">2</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">2</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.37: bajo la media">no · 0.37</span></td>
+</tr><tr data-fecha="2026-10-29T14:33" data-vistas="4.0" data-pct="-1" data-r="0.5374383769966916">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/c7iacRTx19U" rel="noopener">MacBook Pro táctil, la que Steve Jobs descartó</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/29-macbook-pro-tactil-lo-que-cuesta-tocar-la-pantalla/meta.json">macbook-pro-tactil-lo-que-cuesta-tocar-la-pantalla</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/29-macbook-pro-tactil-lo-que-cuesta-tocar-la-pantalla/meta.json (historial)">29-oct</span> <span class="tag" title="Un Short se asienta a las 48 h">&lt;48 h</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/29-macbook-pro-tactil-lo-que-cuesta-tocar-la-pantalla/meta.json">8,30</span> · <span class="dato" title="fuente: publicadas/2026-10/29-macbook-pro-tactil-lo-que-cuesta-tocar-la-pantalla/meta.json">5</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">4</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">4</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.54: bajo la media">no · 0.54</span></td>
+</tr><tr data-fecha="2026-10-28T13:04" data-vistas="12.0" data-pct="-1" data-r="0.834">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/1Yc_1ZD1J70" rel="noopener">Anthropic sale a bolsa y advierte: la IA podría ser riesgo existencial</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/28-anthropic-sale-a-la-bolsa-la-salida-mas-grande-de-/meta.json">anthropic-sale-a-la-bolsa-la-salida-mas-grande-de-</span> · <a href="https://www.tiktok.com/@radarexplica/video/7701822521301028104" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/28-anthropic-sale-a-la-bolsa-la-salida-mas-grande-de-/meta.json (historial)">28-oct</span></td>
+  <td class="c-senal"><span class="sin" title="publicadas/2026-10/28-anthropic-sale-a-la-bolsa-la-salida-mas-grande-de-/meta.json: senal vacía">sin señal</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">12</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">4</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="c-r"><span class="chip chip--tibio" title="r = 0.83: en la media">media · 0.83</span></td>
+</tr><tr data-fecha="2026-10-28T12:00" data-vistas="10.0" data-pct="-1" data-r="0.779">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/7nOdx6XiY0U" rel="noopener">Cascada que fluye hacia arriba: pasa en Escocia y en Sudamérica</a></div><div class="sub"><span class="chip chip--serie-viral">viral</span> <span class="ruta" title="publicadas/2026-10/28-la-cascada-que-fluye-hacia-arriba-en-escocia/meta.json">la-cascada-que-fluye-hacia-arriba-en-escocia</span> · <a href="https://www.tiktok.com/@radarexplica/video/7701815618038795528" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/28-la-cascada-que-fluye-hacia-arriba-en-escocia/meta.json (historial)">28-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/28-la-cascada-que-fluye-hacia-arriba-en-escocia/meta.json">3,80</span> · <span class="dato" title="fuente: publicadas/2026-10/28-la-cascada-que-fluye-hacia-arriba-en-escocia/meta.json">3</span> merc. · <span class="chip chip--subiendo">subiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">10</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">3</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.78: bajo la media">no · 0.78</span></td>
+</tr><tr data-fecha="2026-10-28T10:53" data-vistas="56.0" data-pct="-1" data-r="1.314">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/BrIw8_hHl0E" rel="noopener">Kbeto Zuleta: qué se sabe del accidente del bus</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/28-kbeto-zuleta-que-paso-con-el-bus-y-el-control-del-/meta.json">kbeto-zuleta-que-paso-con-el-bus-y-el-control-del-</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/28-kbeto-zuleta-que-paso-con-el-bus-y-el-control-del-/meta.json (historial)">28-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/28-kbeto-zuleta-que-paso-con-el-bus-y-el-control-del-/meta.json">7,19</span> · <span class="dato" title="fuente: publicadas/2026-10/28-kbeto-zuleta-que-paso-con-el-bus-y-el-control-del-/meta.json">2</span> merc. · <span class="chip chip--ardiendo">ardiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">56</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="c-r"><span class="chip chip--ardiendo" title="r = 1.31: muy sobre la media del canal">sí · 1.31</span></td>
+</tr><tr data-fecha="2026-10-28T08:00" data-vistas="4.0" data-pct="-1" data-r="0.523">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/_ibKY_udUa8" rel="noopener">¿Por qué Argentina registró la entrada de Flávio Bolsonaro?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/28-flavio-bolsonaro-sale-de-argentina-rumbo-a-ee-uu-t/meta.json">flavio-bolsonaro-sale-de-argentina-rumbo-a-ee-uu-t</span> · <a href="https://www.tiktok.com/@radarexplica/video/7701822889435122952" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/28-flavio-bolsonaro-sale-de-argentina-rumbo-a-ee-uu-t/meta.json (historial)">28-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/28-flavio-bolsonaro-sale-de-argentina-rumbo-a-ee-uu-t/meta.json">6,20</span> · <span class="dato" title="fuente: publicadas/2026-10/28-flavio-bolsonaro-sale-de-argentina-rumbo-a-ee-uu-t/meta.json">5</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">4</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">1</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="num"><span class="sin">sin datos</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.52: bajo la media">no · 0.52</span></td>
+</tr><tr data-fecha="2026-10-27T08:45" data-vistas="16.0" data-pct="67.0" data-r="0.994">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/nZdqloJMKCA" rel="noopener">¿Se gana el Balón de Oro sin Champions? Kane lo hizo</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/27-harry-kane-gana-el-balon-de-oro-2026-73-goles-y-lo/meta.json">harry-kane-gana-el-balon-de-oro-2026-73-goles-y-lo</span> · <a href="https://www.tiktok.com/@radarexplica/video/7701712890616745236" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/27-harry-kane-gana-el-balon-de-oro-2026-73-goles-y-lo/meta.json (historial)">27-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/27-harry-kane-gana-el-balon-de-oro-2026-73-goles-y-lo/meta.json">10,53</span> · <span class="dato" title="fuente: publicadas/2026-10/27-harry-kane-gana-el-balon-de-oro-2026-73-goles-y-lo/meta.json">5</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">16</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">1</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">67,0 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--tibio" title="r = 0.99: en la media">media · 0.99</span></td>
+</tr><tr data-fecha="2026-10-27T08:45" data-vistas="6.0" data-pct="62.7" data-r="0.793">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/OucpmFabitY" rel="noopener">Big Bang de la Bolsa de Londres: qué cambió en 1986</a></div><div class="sub"><span class="chip chip--serie-efemeride">Un día como hoy</span> <span class="ruta" title="publicadas/2026-10/27-un-dia-como-hoy-el-big-bang-de-la-bolsa-de-londres/meta.json">un-dia-como-hoy-el-big-bang-de-la-bolsa-de-londres</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/27-un-dia-como-hoy-el-big-bang-de-la-bolsa-de-londres/meta.json (historial)">27-oct</span></td>
+  <td class="c-senal"><span class="sin" title="publicadas/2026-10/27-un-dia-como-hoy-el-big-bang-de-la-bolsa-de-londres/meta.json: senal vacía">sin señal</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">6</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">62,7 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.79: bajo la media">no · 0.79</span></td>
+</tr><tr data-fecha="2026-10-26T08:12" data-vistas="92.0" data-pct="58.2" data-r="1.267">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/wNYlhZCvruY" rel="noopener">El Niño 2026: ¿qué dicen la NOAA y la OMM?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/26-el-nino-que-dicen-la-noaa-y-la-omm/meta.json">el-nino-que-dicen-la-noaa-y-la-omm</span> · <a href="https://www.tiktok.com/@radarexplica/video/7701712147478301973" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/26-el-nino-que-dicen-la-noaa-y-la-omm/meta.json (historial)">26-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/26-el-nino-que-dicen-la-noaa-y-la-omm/meta.json">3,86</span> · <span class="dato" title="fuente: publicadas/2026-10/26-el-nino-que-dicen-la-noaa-y-la-omm/meta.json">4</span> merc. · <span class="chip chip--subiendo">subiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">92</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">11</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">58,2 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--caliente" title="r = 1.27: sobre la media">sí · 1.27</span></td>
+</tr><tr data-fecha="2026-10-26T08:12" data-vistas="97.0" data-pct="46.5" data-r="1.2">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/MlK1pyiNJQc" rel="noopener">¿Quién fue Eric Bauza, la voz de Bugs Bunny?</a></div><div class="sub"><span class="chip chip--serie-inspira">inspira</span> <span class="ruta" title="publicadas/2026-10/26-eric-bauza-la-voz-de-bugs-bunny-murio-a-los-46-ano/meta.json">eric-bauza-la-voz-de-bugs-bunny-murio-a-los-46-ano</span> · <a href="https://www.tiktok.com/@radarexplica/video/7701712521891171605" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/26-eric-bauza-la-voz-de-bugs-bunny-murio-a-los-46-ano/meta.json (historial)">26-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/26-eric-bauza-la-voz-de-bugs-bunny-murio-a-los-46-ano/meta.json">5,14</span> · <span class="dato" title="fuente: publicadas/2026-10/26-eric-bauza-la-voz-de-bugs-bunny-murio-a-los-46-ano/meta.json">4</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">97</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">5</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">46,5 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--caliente" title="r = 1.20: sobre la media">sí · 1.20</span></td>
+</tr><tr data-fecha="2026-10-26T08:12" data-vistas="12.0" data-pct="184.2" data-r="1.714">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/RdufRN9nlF4" rel="noopener">¿Puede anularse la elección de Brasil? Lo que dice Flávio</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/26-lula-gana-en-brasil-y-flavio-bolsonaro-pide-anular/meta.json">lula-gana-en-brasil-y-flavio-bolsonaro-pide-anular</span> · <a href="https://www.tiktok.com/@radarexplica/video/7701711309053742356" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/26-lula-gana-en-brasil-y-flavio-bolsonaro-pide-anular/meta.json (historial)">26-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/26-lula-gana-en-brasil-y-flavio-bolsonaro-pide-anular/meta.json">7,17</span> · <span class="dato" title="fuente: publicadas/2026-10/26-lula-gana-en-brasil-y-flavio-bolsonaro-pide-anular/meta.json">4</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">12</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">184,2 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--ardiendo" title="r = 1.71: muy sobre la media del canal">sí · 1.71</span></td>
+</tr><tr data-fecha="2026-10-26T08:12" data-vistas="16.0" data-pct="107.5" data-r="1.261">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/6gR8KwIU1Os" rel="noopener">¿Qué significa el regreso de María Corina Machado a Venezuela?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/26-maria-corina-machado-vuelve-a-venezuela-que-signif/meta.json">maria-corina-machado-vuelve-a-venezuela-que-signif</span> · <a href="https://www.tiktok.com/@radarexplica/video/7701711781135600916" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/26-maria-corina-machado-vuelve-a-venezuela-que-signif/meta.json (historial)">26-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/26-maria-corina-machado-vuelve-a-venezuela-que-signif/meta.json">6,57</span> · <span class="dato" title="fuente: publicadas/2026-10/26-maria-corina-machado-vuelve-a-venezuela-que-signif/meta.json">5</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">16</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">107,5 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--caliente" title="r = 1.26: sobre la media">sí · 1.26</span></td>
+</tr><tr data-fecha="2026-10-26T08:12" data-vistas="19.0" data-pct="90.4" data-r="1.18">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/rsTrsCTPjac" rel="noopener">¿Qué fue la locura de Clinton? El Canal Erie, 1825</a></div><div class="sub"><span class="chip chip--serie-efemeride">Un día como hoy</span> <span class="ruta" title="publicadas/2026-10/26-un-dia-como-hoy-el-canal-erie-se-inaugura/meta.json">un-dia-como-hoy-el-canal-erie-se-inaugura</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/26-un-dia-como-hoy-el-canal-erie-se-inaugura/meta.json (historial)">26-oct</span></td>
+  <td class="c-senal"><span class="sin" title="publicadas/2026-10/26-un-dia-como-hoy-el-canal-erie-se-inaugura/meta.json: senal vacía">sin señal</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">19</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">1</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">90,4 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--caliente" title="r = 1.18: sobre la media">sí · 1.18</span></td>
+</tr><tr data-fecha="2026-10-25T07:55" data-vistas="711.0" data-pct="71.2" data-r="1.75">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/qPe5fldnAUA" rel="noopener">¿Qué pasó con los 4 militares salvadoreños en Haití?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/25-bukele-envia-fuerzas-a-haiti-que-paso-con-los-4-mi/meta.json">bukele-envia-fuerzas-a-haiti-que-paso-con-los-4-mi</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/25-bukele-envia-fuerzas-a-haiti-que-paso-con-los-4-mi/meta.json (historial)">25-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/25-bukele-envia-fuerzas-a-haiti-que-paso-con-los-4-mi/meta.json">7,41</span> · <span class="dato" title="fuente: publicadas/2026-10/25-bukele-envia-fuerzas-a-haiti-que-paso-con-los-4-mi/meta.json">4</span> merc. · <span class="chip chip--ardiendo">ardiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">711</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">9</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">71,2 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">2</span></td>
+  <td class="c-r"><span class="chip chip--ardiendo" title="r = 1.75: muy sobre la media del canal">sí · 1.75</span></td>
+</tr><tr data-fecha="2026-10-25T07:55" data-vistas="3174.0" data-pct="70.5" data-r="2.037">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/vJbKabjR7Us" rel="noopener">Elecciones Brasil 2026: Lula vs Flávio, ¿cómo se vota?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/25-elecciones-brasil-2026-lula-vs-flavio-bolsonaro-co/meta.json">elecciones-brasil-2026-lula-vs-flavio-bolsonaro-co</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/25-elecciones-brasil-2026-lula-vs-flavio-bolsonaro-co/meta.json (historial)">25-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/25-elecciones-brasil-2026-lula-vs-flavio-bolsonaro-co/meta.json">8,11</span> · <span class="dato" title="fuente: publicadas/2026-10/25-elecciones-brasil-2026-lula-vs-flavio-bolsonaro-co/meta.json">4</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">3.174</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">5</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">70,5 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">4</span></td>
+  <td class="c-r"><span class="chip chip--ardiendo" title="r = 2.04: muy sobre la media del canal">sí · 2.04</span></td>
+</tr><tr data-fecha="2026-10-25T07:55" data-vistas="14.0" data-pct="65.9" data-r="0.962">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/LAEbsnER6H4" rel="noopener">179 millones por un Picasso: ¿de dónde venía el pintor?</a></div><div class="sub"><span class="chip chip--serie-efemeride">Un día como hoy</span> <span class="ruta" title="publicadas/2026-10/25-un-dia-como-hoy-nace-pablo-picasso/meta.json">un-dia-como-hoy-nace-pablo-picasso</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/25-un-dia-como-hoy-nace-pablo-picasso/meta.json (historial)">25-oct</span></td>
+  <td class="c-senal"><span class="sin" title="publicadas/2026-10/25-un-dia-como-hoy-nace-pablo-picasso/meta.json: senal vacía">sin señal</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">14</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">2</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">65,9 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">1</span></td>
+  <td class="c-r"><span class="chip chip--tibio" title="r = 0.96: en la media">media · 0.96</span></td>
+</tr><tr data-fecha="2026-10-24T08:25" data-vistas="8.0" data-pct="30.7" data-r="0.631">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/DudNDSDxd6I" rel="noopener">Francia, Acto II: ¿qué piden y qué responde el Gobierno?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/24-francia-vuelve-a-la-calle-que-pasa-hoy/meta.json">francia-vuelve-a-la-calle-que-pasa-hoy</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/24-francia-vuelve-a-la-calle-que-pasa-hoy/meta.json (historial)">24-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/24-francia-vuelve-a-la-calle-que-pasa-hoy/meta.json">3,74</span> · <span class="dato" title="fuente: publicadas/2026-10/24-francia-vuelve-a-la-calle-que-pasa-hoy/meta.json">3</span> merc. · <span class="chip chip--subiendo">subiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">8</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">30,7 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.63: bajo la media">no · 0.63</span></td>
+</tr><tr data-fecha="2026-10-24T08:25" data-vistas="11.0" data-pct="29.4" data-r="0.678">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/T5zto7_9KG8" rel="noopener">¿Quién bajó el Niágara en un barril a los 63 años?</a></div><div class="sub"><span class="chip chip--serie-efemeride">Un día como hoy</span> <span class="ruta" title="publicadas/2026-10/24-un-dia-como-hoy-annie-edson-taylor-baja-el-niagara/meta.json">un-dia-como-hoy-annie-edson-taylor-baja-el-niagara</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/24-un-dia-como-hoy-annie-edson-taylor-baja-el-niagara/meta.json (historial)">24-oct</span></td>
+  <td class="c-senal"><span class="sin" title="publicadas/2026-10/24-un-dia-como-hoy-annie-edson-taylor-baja-el-niagara/meta.json: senal vacía">sin señal</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">11</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">29,4 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.68: bajo la media">no · 0.68</span></td>
+</tr><tr data-fecha="2026-10-24T08:24" data-vistas="110.0" data-pct="61.4" data-r="1.323">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/CQfQk6TIoYs" rel="noopener">¿Qué se sabe de los cuatro salvadoreños desaparecidos en Haití?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/24-cuatro-soldados-salvadorenos-desaparecidos-en-hait/meta.json">cuatro-soldados-salvadorenos-desaparecidos-en-hait</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/24-cuatro-soldados-salvadorenos-desaparecidos-en-hait/meta.json (historial)">24-oct</span></td>
+  <td class="c-senal"><span class="sin" title="publicadas/2026-10/24-cuatro-soldados-salvadorenos-desaparecidos-en-hait/meta.json: senal vacía">sin señal</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">110</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">61,4 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--ardiendo" title="r = 1.32: muy sobre la media del canal">sí · 1.32</span></td>
+</tr><tr data-fecha="2026-10-24T08:24" data-vistas="7.0" data-pct="65.7" data-r="0.838">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/qUHtdfI6wlc" rel="noopener">¿Qué es el rayo de calor que el Pentágono autorizó para DHS?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/24-el-rayo-de-calor-en-la-frontera-hegseth-autoriza-l/meta.json">el-rayo-de-calor-en-la-frontera-hegseth-autoriza-l</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/24-el-rayo-de-calor-en-la-frontera-hegseth-autoriza-l/meta.json (historial)">24-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/24-el-rayo-de-calor-en-la-frontera-hegseth-autoriza-l/meta.json">3,74</span> · <span class="dato" title="fuente: publicadas/2026-10/24-el-rayo-de-calor-en-la-frontera-hegseth-autoriza-l/meta.json">3</span> merc. · <span class="chip chip--subiendo">subiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">7</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">65,7 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--tibio" title="r = 0.84: en la media">media · 0.84</span></td>
+</tr><tr data-fecha="2026-10-24T08:24" data-vistas="82.0" data-pct="67.2" data-r="1.304">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/i1NzxOBgMAA" rel="noopener">¿Había aviso cuando la ola alcanzó al reportero de ETB2?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/24-ola-gigante-el-periodista-de-etb2-alcanzado-en-ond/meta.json">ola-gigante-el-periodista-de-etb2-alcanzado-en-ond</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/24-ola-gigante-el-periodista-de-etb2-alcanzado-en-ond/meta.json (historial)">24-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/24-ola-gigante-el-periodista-de-etb2-alcanzado-en-ond/meta.json">4,31</span> · <span class="dato" title="fuente: publicadas/2026-10/24-ola-gigante-el-periodista-de-etb2-alcanzado-en-ond/meta.json">4</span> merc. · <span class="chip chip--caliente">caliente</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">82</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">5</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">67,2 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--ardiendo" title="r = 1.30: muy sobre la media del canal">sí · 1.30</span></td>
+</tr><tr data-fecha="2026-10-23T07:43" data-vistas="9.0" data-pct="66.0" data-r="0.884">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/EgA46pWzaRE" rel="noopener">Virus Shamonda: primer caso humano, qué se sabe y qué no</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/23-shamonda-el-primer-caso-humano/meta.json">shamonda-el-primer-caso-humano</span></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/23-shamonda-el-primer-caso-humano/meta.json (historial)">23-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/23-shamonda-el-primer-caso-humano/meta.json">4,61</span> · <span class="dato" title="fuente: publicadas/2026-10/23-shamonda-el-primer-caso-humano/meta.json">4</span> merc. · <span class="chip chip--caliente">caliente</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">9</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">66,0 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--tibio" title="r = 0.88: en la media">media · 0.88</span></td>
+</tr><tr data-fecha="2026-10-22T12:08" data-vistas="6.0" data-pct="90.4" data-r="0.975">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/xJ_M4Vh0Kt8" rel="noopener">¿Por qué Milei pide votos para una congresista de Miami?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/22-milei-apoya-a-maria-elvira-salazar/meta.json">milei-apoya-a-maria-elvira-salazar</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699474797557927188" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/22-milei-apoya-a-maria-elvira-salazar/meta.json (historial)">22-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/22-milei-apoya-a-maria-elvira-salazar/meta.json">7,21</span> · <span class="dato" title="fuente: publicadas/2026-10/22-milei-apoya-a-maria-elvira-salazar/meta.json">2</span> merc. · <span class="chip chip--ardiendo">ardiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">6</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">90,4 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--tibio" title="r = 0.97: en la media">media · 0.97</span></td>
+</tr><tr data-fecha="2026-10-22T11:23" data-vistas="8.0" data-pct="59.4" data-r="0.82">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/ekjuTrWEjb8" rel="noopener">¿Por qué Brasil se juega el domingo entre Lula y Flávio Bolsonaro?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/22-lula-y-flavio-bolsonaro-segunda-vuelta-en-brasil/meta.json">lula-y-flavio-bolsonaro-segunda-vuelta-en-brasil</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699472536349789460" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/22-lula-y-flavio-bolsonaro-segunda-vuelta-en-brasil/meta.json (historial)">22-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/22-lula-y-flavio-bolsonaro-segunda-vuelta-en-brasil/meta.json">3,65</span> · <span class="dato" title="fuente: publicadas/2026-10/22-lula-y-flavio-bolsonaro-segunda-vuelta-en-brasil/meta.json">4</span> merc. · <span class="chip chip--subiendo">subiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">8</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">59,4 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--tibio" title="r = 0.82: en la media">media · 0.82</span></td>
+</tr><tr data-fecha="2026-10-22T11:23" data-vistas="5.0" data-pct="31.0" data-r="0.554">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/mKom2WL6duQ" rel="noopener">¿Por qué un juez ordenó a Meta pagar 25.000 millones?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/22-meta-y-la-multa-de-nuevo-mexico/meta.json">meta-y-la-multa-de-nuevo-mexico</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699475213708283156" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/22-meta-y-la-multa-de-nuevo-mexico/meta.json (historial)">22-oct</span></td>
+  <td class="c-senal"><span class="sin" title="publicadas/2026-10/22-meta-y-la-multa-de-nuevo-mexico/meta.json: senal vacía">sin señal</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">5</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">31,0 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.55: bajo la media">no · 0.55</span></td>
+</tr><tr data-fecha="2026-10-22T11:09" data-vistas="12.0" data-pct="48.4" data-r="0.819">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/RddUGxQ3eWs" rel="noopener">¿Qué significa realmente un El Niño &quot;muy fuerte&quot;?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/22-el-nino-que-significa-muy-fuerte/meta.json">el-nino-que-significa-muy-fuerte</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699472180467272966" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/22-el-nino-que-significa-muy-fuerte/meta.json (historial)">22-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/22-el-nino-que-significa-muy-fuerte/meta.json">3,78</span> · <span class="dato" title="fuente: publicadas/2026-10/22-el-nino-que-significa-muy-fuerte/meta.json">4</span> merc. · <span class="chip chip--subiendo">subiendo</span> · YouTube</td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">12</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">1</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">48,4 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--tibio" title="r = 0.82: en la media">media · 0.82</span></td>
+</tr><tr data-fecha="2026-10-21T20:24" data-vistas="7.0" data-pct="16.9" data-r="0.517">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/Sq8Y_vW6eeA" rel="noopener">¿Quién decide cuándo termina un toque de queda en Francia?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/21-francia-toque-de-queda-y-trump/meta.json">francia-toque-de-queda-y-trump</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699219948773788949" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/21-francia-toque-de-queda-y-trump/meta.json (historial)">21-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/21-francia-toque-de-queda-y-trump/meta.json">5,37</span> · <span class="dato" title="fuente: publicadas/2026-10/21-francia-toque-de-queda-y-trump/meta.json">4</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">7</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">16,9 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.52: bajo la media">no · 0.52</span></td>
+</tr><tr data-fecha="2026-10-21T20:24" data-vistas="14.0" data-pct="32.2" data-r="0.74">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/MZazPmEtOkE" rel="noopener">¿Por qué Japón quiere traer rocas de una luna de Marte?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/21-japon-va-a-buscar-rocas-a-marte/meta.json">japon-va-a-buscar-rocas-a-marte</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699471478298856725" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/21-japon-va-a-buscar-rocas-a-marte/meta.json (historial)">21-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/21-japon-va-a-buscar-rocas-a-marte/meta.json">5,61</span> · <span class="dato" title="fuente: publicadas/2026-10/21-japon-va-a-buscar-rocas-a-marte/meta.json">5</span> merc. · <span class="chip chip--ardiendo">ardiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">14</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">1</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">32,2 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">2</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.74: bajo la media">no · 0.74</span></td>
+</tr><tr data-fecha="2026-10-21T20:24" data-vistas="10.0" data-pct="29.8" data-r="0.664">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/Zy3FC53FLMI" rel="noopener">Milei, Sánchez y Lula: ¿tiene costo o es solo ruido?</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/21-milei-vs-sanchez-y-lula/meta.json">milei-vs-sanchez-y-lula</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699220206618430721" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/21-milei-vs-sanchez-y-lula/meta.json (historial)">21-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/21-milei-vs-sanchez-y-lula/meta.json">3,60</span> · <span class="dato" title="fuente: publicadas/2026-10/21-milei-vs-sanchez-y-lula/meta.json">2</span> merc. · <span class="chip chip--subiendo">subiendo</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">10</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">29,8 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.66: bajo la media">no · 0.66</span></td>
+</tr><tr data-fecha="2026-10-21T20:24" data-vistas="10.0" data-pct="32.8" data-r="0.684">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/jjY7nF_vwSY" rel="noopener">¿Se fusionarán SpaceX y Tesla? Lo que dijo Musk</a></div><div class="sub"><span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <span class="ruta" title="publicadas/2026-10/21-musk-quiere-fusionar-spacex-y-tesla/meta.json">musk-quiere-fusionar-spacex-y-tesla</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699219704816176405" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/21-musk-quiere-fusionar-spacex-y-tesla/meta.json (historial)">21-oct</span></td>
+  <td class="c-senal"><span class="dato" title="fuente: publicadas/2026-10/21-musk-quiere-fusionar-spacex-y-tesla/meta.json">4,20</span> · <span class="dato" title="fuente: publicadas/2026-10/21-musk-quiere-fusionar-spacex-y-tesla/meta.json">4</span> merc. · <span class="chip chip--caliente">caliente</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">10</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">32,8 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.68: bajo la media">no · 0.68</span></td>
+</tr><tr data-fecha="2026-10-21T20:24" data-vistas="14.0" data-pct="32.6" data-r="0.743">
+  <td class="c-titulo"><div class="titulo"><a href="https://youtube.com/shorts/Ordy5-hLNYY" rel="noopener">¿Por qué IBM y GE rechazaron la fotocopia?</a></div><div class="sub"><span class="chip chip--serie-efemeride">Un día como hoy</span> <span class="ruta" title="publicadas/2026-10/21-un-dia-como-hoy-nacio-la-fotocopia/meta.json">un-dia-como-hoy-nacio-la-fotocopia</span> · <a href="https://www.tiktok.com/@radarexplica/video/7699220477365062932" rel="noopener">TikTok</a></div></td>
+  <td class="c-fecha"><span class="dato" title="fuente: publicadas/2026-10/21-un-dia-como-hoy-nacio-la-fotocopia/meta.json (historial)">21-oct</span></td>
+  <td class="c-senal"><span class="sin" title="publicadas/2026-10/21-un-dia-como-hoy-nacio-la-fotocopia/meta.json: senal vacía">sin señal</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">14</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">0</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">32,6 %</span></td>
+  <td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">1</span></td>
+  <td class="c-r"><span class="chip chip--frio" title="r = 0.74: bajo la media">no · 0.74</span></td>
+</tr></tbody>
+</table></div>
+<p class="pie">% visto manda (meta &gt; 60 %). Vistas sin retención = gancho bueno, video flojo; retención sin vistas = video bueno, tema o título flojo. TikTok: solo enlace; sus métricas se cargan a mano (data/metricas/tiktok-*.csv).</p>
+</section>
+<section class="panel" id="aprendizaje" role="tabpanel">
+<h1>Aprendizaje<small>qué rasgos rinden y qué hacer con eso</small></h1>
+<p class="actualizado">estado: firme · 29 videos · snapshot 2026-10-30 · generado 2026-10-30T04:17-03:00 · fuente: data/aprendizaje/pesos.json · estratega: data/crecimiento/2026-10-30.md</p>
+<section><h2>Lifts por rasgo <span class="cuenta">34</span></h2>
+<p class="nota">Lift = rendimiento promedio de los videos con ese rasgo contra la media del canal, con shrinkage hacia 1,0 (k=3). El radar multiplica el puntaje por la media geométrica de los lifts del tema.</p>
+<div class="tabla-envuelta"><table class="tabla"><thead><tr><th>Rasgo</th><th>Lift (0,6–1,6)</th><th class="num">n</th><th class="num">crudo</th></tr></thead><tbody><tr><td><code>dia_semana=domingo</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:81%;background:#FEA875"></span></span><span class="barra__txt">1.30</span></td><td class="num"><span class="dato" title="videos con ese rasgo">3</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.59</span></td></tr><tr><td><code>fuente:trends=si</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:78%;background:#FD9B6D"></span></span><span class="barra__txt">1.25</span></td><td class="num"><span class="dato" title="videos con ese rasgo">2</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.63</span></td></tr><tr><td><code>fuente:wikipedia=si</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:78%;background:#FC986D"></span></span><span class="barra__txt">1.24</span></td><td class="num"><span class="dato" title="videos con ese rasgo">8</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.33</span></td></tr><tr><td><code>dia_semana=lunes</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:76%;background:#F8906C"></span></span><span class="barra__txt">1.21</span></td><td class="num"><span class="dato" title="videos con ese rasgo">5</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.33</span></td></tr><tr><td><code>temperatura=ardiendo</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:72%;background:#F3816B"></span></span><span class="barra__txt">1.15</span></td><td class="num"><span class="dato" title="videos con ese rasgo">11</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.19</span></td></tr><tr><td><code>sensible=si</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:71%;background:#F17D6B"></span></span><span class="barra__txt">1.13</span></td><td class="num"><span class="dato" title="videos con ese rasgo">9</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.18</span></td></tr><tr><td><code>hora_publicacion=06-09</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:70%;background:#F07A6B"></span></span><span class="barra__txt">1.12</span></td><td class="num"><span class="dato" title="videos con ese rasgo">17</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.15</span></td></tr><tr><td><code>categoria=persona</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:69%;background:#EE756B"></span></span><span class="barra__txt">1.10</span></td><td class="num"><span class="dato" title="videos con ese rasgo">5</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.17</span></td></tr><tr><td><code>mercados=4-5</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:68%;background:#ED726A"></span></span><span class="barra__txt">1.09</span></td><td class="num"><span class="dato" title="videos con ese rasgo">15</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.11</span></td></tr><tr><td><code>fuente:youtube=si</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:66%;background:#EA6A6A"></span></span><span class="barra__txt">1.06</span></td><td class="num"><span class="dato" title="videos con ese rasgo">9</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.08</span></td></tr><tr><td><code>redes=youtube</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:66%;background:#EA6A6A"></span></span><span class="barra__txt">1.06</span></td><td class="num"><span class="dato" title="videos con ese rasgo">9</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.08</span></td></tr><tr><td><code>fuente:noticias=si</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:66%;background:#EA696A"></span></span><span class="barra__txt">1.06</span></td><td class="num"><span class="dato" title="videos con ese rasgo">14</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.07</span></td></tr><tr><td><code>serie=inspira</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:66%;background:#E9686A"></span></span><span class="barra__txt">1.05</span></td><td class="num"><span class="dato" title="videos con ese rasgo">1</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.21</span></td></tr><tr><td><code>categoria=evento</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:66%;background:#E9676A"></span></span><span class="barra__txt">1.05</span></td><td class="num"><span class="dato" title="videos con ese rasgo">7</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.07</span></td></tr><tr><td><code>serie=tema</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:64%;background:#E76169"></span></span><span class="barra__txt">1.02</span></td><td class="num"><span class="dato" title="videos con ese rasgo">22</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.03</span></td></tr><tr><td><code>tipo_titulo=pregunta</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:63%;background:#E65E69"></span></span><span class="barra__txt">1.01</span></td><td class="num"><span class="dato" title="videos con ese rasgo">24</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.01</span></td></tr><tr><td><code>redes=ninguna</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:63%;background:#E55D69"></span></span><span class="barra__txt">1.01</span></td><td class="num"><span class="dato" title="videos con ese rasgo">12</span></td><td class="num"><span class="dato" title="lift sin shrinkage">1.01</span></td></tr><tr><td><code>mercados=2</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:62%;background:#E45969"></span></span><span class="barra__txt">1.00</span></td><td class="num"><span class="dato" title="videos con ese rasgo">3</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.99</span></td></tr><tr><td><code>temperatura=caliente</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:61%;background:#E35669"></span></span><span class="barra__txt">0.98</span></td><td class="num"><span class="dato" title="videos con ese rasgo">3</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.96</span></td></tr><tr><td><code>dia_semana=sabado</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:61%;background:#E25469"></span></span><span class="barra__txt">0.98</span></td><td class="num"><span class="dato" title="videos con ese rasgo">5</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.96</span></td></tr><tr><td><code>dia_semana=viernes</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:61%;background:#E25369"></span></span><span class="barra__txt">0.97</span></td><td class="num"><span class="dato" title="videos con ese rasgo">1</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.89</span></td></tr><tr><td><code>categoria=otro</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:60%;background:#E15168"></span></span><span class="barra__txt">0.96</span></td><td class="num"><span class="dato" title="videos con ese rasgo">9</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.95</span></td></tr><tr><td><code>dia_semana=martes</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:60%;background:#E15068"></span></span><span class="barra__txt">0.96</span></td><td class="num"><span class="dato" title="videos con ese rasgo">2</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.90</span></td></tr><tr><td><code>tipo_titulo=afirmacion</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:60%;background:#E04F68"></span></span><span class="barra__txt">0.95</span></td><td class="num"><span class="dato" title="videos con ese rasgo">5</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.93</span></td></tr><tr><td><code>sensible=no</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:59%;background:#E04E68"></span></span><span class="barra__txt">0.95</span></td><td class="num"><span class="dato" title="videos con ese rasgo">12</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.94</span></td></tr><tr><td><code>serie=viral</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:59%;background:#DF4C68"></span></span><span class="barra__txt">0.95</span></td><td class="num"><span class="dato" title="videos con ese rasgo">1</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.79</span></td></tr><tr><td><code>hora_publicacion=12-15</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:58%;background:#DE4968"></span></span><span class="barra__txt">0.94</span></td><td class="num"><span class="dato" title="videos con ese rasgo">3</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.87</span></td></tr><tr><td><code>hora_publicacion=09-12</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:58%;background:#DE4968"></span></span><span class="barra__txt">0.93</span></td><td class="num"><span class="dato" title="videos con ese rasgo">4</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.88</span></td></tr><tr><td><code>serie=efemeride</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:58%;background:#DC4869"></span></span><span class="barra__txt">0.92</span></td><td class="num"><span class="dato" title="videos con ese rasgo">5</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.88</span></td></tr><tr><td><code>temperatura=subiendo</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:55%;background:#D2446C"></span></span><span class="barra__txt">0.89</span></td><td class="num"><span class="dato" title="videos con ese rasgo">7</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.84</span></td></tr><tr><td><code>dia_semana=jueves</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:55%;background:#D2446C"></span></span><span class="barra__txt">0.89</span></td><td class="num"><span class="dato" title="videos con ese rasgo">4</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.80</span></td></tr><tr><td><code>mercados=3</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:55%;background:#D0446C"></span></span><span class="barra__txt">0.88</span></td><td class="num"><span class="dato" title="videos con ese rasgo">3</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.76</span></td></tr><tr><td><code>dia_semana=miercoles</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:51%;background:#C23E70"></span></span><span class="barra__txt">0.82</span></td><td class="num"><span class="dato" title="videos con ese rasgo">9</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.76</span></td></tr><tr><td><code>hora_publicacion=18-21</code></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:50%;background:#BC3C72"></span></span><span class="barra__txt">0.80</span></td><td class="num"><span class="dato" title="videos con ese rasgo">5</span></td><td class="num"><span class="dato" title="lift sin shrinkage">0.68</span></td></tr></tbody></table></div></section>
+<section><h2>Franjas horarias</h2><p class="nota">Lift por franja de publicación (hora de Chile). Las mejores se usan para escalonar los Shorts del día.</p><ul class="franjas"><li><span class="franja">06-09 h</span><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:70%;background:#F07A6B"></span></span><span class="barra__txt">1.12</span></li><li><span class="franja">12-15 h</span><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:58%;background:#DE4968"></span></span><span class="barra__txt">0.94</span></li><li><span class="franja">09-12 h</span><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:58%;background:#DE4968"></span></span><span class="barra__txt">0.93</span></li><li><span class="franja">18-21 h</span><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:50%;background:#BC3C72"></span></span><span class="barra__txt">0.80</span></li></ul></section>
+<section><h2>Hipótesis de la semana</h2><p class="hipotesis"><b>Hipótesis de la semana:</b> fuente:trends=si rinde más que el promedio (lift crudo 1.631, n=2). Faltan ~6 videos con ese rasgo para confirmarla.</p></section>
+<div class="dos">
+<section><h2>Qué escalar</h2><p class="nota">Candidatos a parte 2: últimos 3 días con r ≥ 1,3 o +24 h sobre la media.</p><ul class='lista'><li><b>Kbeto Zuleta: qué se sabe del accidente del bus</b> · rendimiento alto · r 1.35 · 56 vistas</li><li><b>Choque de trenes en España, ¿qué falló?</b> · +24 h sobre la media · r 1.30 · 48 vistas</li><li><b>Anthropic sale a bolsa y advierte: la IA podría ser riesgo existencial</b> · +24 h sobre la media · r 0.86 · 12 vistas</li><li><b>MacBook Pro táctil, la que Steve Jobs descartó</b> · +24 h sobre la media · r 0.54 · 4 vistas</li></ul></section>
+<section><h2>Qué matar</h2><p class="nota">Rasgos con lift &lt; 0,8 y n ≥ 3: no se proponen.</p><ul class='lista'><li><code>hora_publicacion=18-21</code> · lift 0.80, n=5</li></ul></section>
+</div>
+</section>
+<section class="panel" id="meta" role="tabpanel">
+<h1>Meta del mes<small>21-oct → 21-nov · solo Shorts</small></h1>
+<p class="actualizado">día 9 de 31, quedan 22 · snapshot 2026-10-30 · fuente: data/metricas/2026-10-30.csv (32 Shorts del período) · metas: analitica/__init__.py y equipo/ESTRATEGIA.md</p>
+<div class="resumen"><b>Tiempo</b> <span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:29%;background:#6B1E7A"></span></span><span class="barra__txt">29 % del mes</span></div>
+<div class="tabla-envuelta"><table class="tabla"><thead><tr><th>Métrica</th><th class="num">Hoy</th><th class="num">Meta</th><th>Avance</th><th class="num">Esperado hoy</th><th class="num">Ritmo</th><th>Estado</th></tr></thead>
+<tbody><tr><td>Shorts publicados</td><td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">32</span></td><td class="num"><span class="dato" title="fuente: analitica/__init__.py › META">90</span></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:36%;background:#84277F"></span></span><span class="barra__txt">36 %</span></td><td class="num"><span class="dato">26</span></td><td class="num"><span class="dato">2 / día</span></td><td><span class="chip chip--caliente">en ritmo</span></td></tr><tr><td>% visto promedio</td><td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">60,7 %</span></td><td class="num"><span class="dato" title="fuente: analitica/__init__.py › META">60,0 %</span></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:100%;background:#FCFDBF"></span></span><span class="barra__txt">101 %</span></td><td class="num">—</td><td class="num">—</td><td><span class="chip chip--ardiendo">logrado</span></td></tr><tr><td>Mejor Short (vistas)</td><td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">3.174</span></td><td class="num"><span class="dato" title="fuente: analitica/__init__.py › META">50.000</span></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:6%;background:#2F0E5B"></span></span><span class="barra__txt">6 %</span></td><td class="num">—</td><td class="num">—</td><td><span class="chip chip--frio">atrasado</span></td></tr><tr><td>Suscriptores netos</td><td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">10</span></td><td class="num"><span class="dato" title="fuente: analitica/__init__.py › META">500</span></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:2%;background:#290D52"></span></span><span class="barra__txt">2 %</span></td><td class="num"><span class="dato">145</span></td><td class="num"><span class="dato">22 / día</span></td><td><span class="chip chip--frio">atrasado</span></td></tr><tr><td>Vistas totales</td><td class="num"><span class="dato" title="fuente: data/metricas/2026-10-30.csv">4.606</span></td><td class="num"><span class="dato" title="fuente: analitica/__init__.py › META">1.000.000</span></td><td class="c-barra"><span class="barra" aria-hidden="true"><span class="barra__relleno" style="width:0%;background:#280D4F"></span></span><span class="barra__txt">0 %</span></td><td class="num"><span class="dato">290.322</span></td><td class="num"><span class="dato">45.245 / día</span></td><td><span class="chip chip--frio">atrasado</span></td></tr></tbody></table></div>
+
+<p class="nota">3 de los 32 Shorts llevan menos de 48 h: sus vistas todavía no se asientan (el 0 es el snapshot del día de publicación, no un resultado).</p>
+<section><h2>Puntos de control</h2><ul class="puntos"><li class="punto"><span class="chip chip--tibio">Día 10</span><span class="dato">31-oct</span><span class="cuando">en 1 días</span><span class="regla">Promedio bajo 3.000 vistas por Short → cambiar tema o gancho, no el volumen</span></li><li class="punto"><span class="chip chip--tibio">Día 15</span><span class="dato">5-nov</span><span class="cuando">en 6 días</span><span class="regla">Ningún Short sobre 10.000 vistas → revisar el formato completo</span></li><li class="punto"><span class="chip chip--tibio">Día 30</span><span class="dato">21-nov</span><span class="cuando">en 22 días</span><span class="regla">Con los números, Pancho decide seguir, ajustar o parar</span></li></ul></section>
+<p class="pie">Regla del día 10: si el promedio está bajo 3.000 vistas por Short, se cambia tema o gancho, no el volumen (equipo/ESTRATEGIA.md §4).</p>
+</section>
+<section class="panel" id="historia" role="tabpanel">
+<h1>Historia<small>un día por página: el radar de esa noche y lo que se publicó</small></h1>
+<p class="actualizado">fuente: data/radar/AAAA-MM-DD.json · publicaciones: meta.json de cada pieza (historial)</p>
+<ul class="dias"><li class="dia dia--actual">
+  <a class="dia__fecha" href="2026-10-30.html" aria-current="page">viernes 30 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Patrick Stewart, puma rodriguez, Cuauhtémoc Cárdenas
+  
+  
+  <p class='sub'>Nada publicado ni en proceso ese día.</p></div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-29.html">jueves 29 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: carlos tevez, Toledo, macbook pro pantalla proled xdr
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>Choque de trenes en Urda (Toledo): el AVE que alcanzó a un Iryo con el sistema LZB caído <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/02a7kayy9R0" rel=noopener>YouTube</a></li><li>Flávio Bolsonaro se declaró presidente de Brasil desde EE. UU. y borró la carta <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/4cyVIbKR07E" rel=noopener>YouTube</a></li><li>MacBook Pro táctil: lo que cuesta tocar la pantalla <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/c7iacRTx19U" rel=noopener>YouTube</a></li></ul>
+  <p class='sub'>Piezas en proceso creadas ese día:</p><ul class='lista'><li>La jueza del caso Maduro y la inmunidad soberana <span class="chip chip--proceso" title="contenido/2026-10-29-la-jueza-del-caso-maduro-y-la-inmunidad-soberana">tema aprobado</span></li></ul>
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-28.html">miércoles 28 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Harry Kane, Elecciones parlamentarias de Israel de 2026, Kbeto Zuleta
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>Anthropic sale a la bolsa: la salida más grande de la historia <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/1Yc_1ZD1J70" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7701822521301028104" rel=noopener>TikTok</a></li><li>Flávio Bolsonaro sale de Argentina rumbo a EE. UU. tras perder <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/_ibKY_udUa8" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7701822889435122952" rel=noopener>TikTok</a></li><li>Kbeto Zuleta: qué pasó con el bus y el control del transporte de artistas <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/BrIw8_hHl0E" rel=noopener>YouTube</a></li><li>La cascada que fluye hacia arriba en Escocia <span class="chip chip--serie-viral">viral</span> <a href="https://youtube.com/shorts/7nOdx6XiY0U" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7701815618038795528" rel=noopener>TikTok</a></li></ul>
+  
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-27.html">martes 27 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Jair Bolsonaro, Balón de Oro 2026, Balón de Oro
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>Harry Kane gana el Balón de Oro 2026: 73 goles y lo que se sabe de la gala <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/nZdqloJMKCA" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7701712890616745236" rel=noopener>TikTok</a></li><li>Un día como hoy: el Big Bang de la Bolsa de Londres (1986) <span class="chip chip--serie-efemeride">Un día como hoy</span> <a href="https://youtube.com/shorts/OucpmFabitY" rel=noopener>YouTube</a></li></ul>
+  <p class='sub'>Piezas en proceso creadas ese día:</p><ul class='lista'><li>Delcy Rodríguez sobre el regreso de María Corina Machado: qué dijo y qué no <span class="chip chip--proceso" title="contenido/2026-10-27-delcy-rodriguez-sobre-el-regreso-de-maria-corina-m">producida</span></li><li>Elecciones Brasil — Ep. 3: el PL de Flávio reconoce a Lula mientras Flávio pide anular <span class="chip chip--proceso" title="contenido/2026-10-27-elecciones-brasil-ep-3-el-pl-de-flavio-reconoce-a-">producida</span></li></ul>
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-26.html">lunes 26 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Brasil, Flávio Bolsonaro, María Corina Machado
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>El Niño: qué dicen la NOAA y la OMM <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/wNYlhZCvruY" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7701712147478301973" rel=noopener>TikTok</a></li><li>Eric Bauza, la voz de Bugs Bunny, murió a los 46 años <span class="chip chip--serie-inspira">inspira</span> <a href="https://youtube.com/shorts/MlK1pyiNJQc" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7701712521891171605" rel=noopener>TikTok</a></li><li>Lula gana en Brasil y Flávio Bolsonaro pide anular: qué sigue <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/RdufRN9nlF4" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7701711309053742356" rel=noopener>TikTok</a></li><li>María Corina Machado vuelve a Venezuela: qué significa <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/6gR8KwIU1Os" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7701711781135600916" rel=noopener>TikTok</a></li><li>Un día como hoy: el Canal Erie se inaugura <span class="chip chip--serie-efemeride">Un día como hoy</span> <a href="https://youtube.com/shorts/rsTrsCTPjac" rel=noopener>YouTube</a></li></ul>
+  
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-25.html">domingo 25 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Flávio Bolsonaro, Haití, Huracán Otis
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>Bukele envía fuerzas a Haití: qué pasó con los 4 militares salvadoreños <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/qPe5fldnAUA" rel=noopener>YouTube</a></li><li>Elecciones Brasil 2026: Lula vs Flávio Bolsonaro, cómo se vota y cuándo hay resultados <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/vJbKabjR7Us" rel=noopener>YouTube</a></li><li>Un día como hoy: nace Pablo Picasso <span class="chip chip--serie-efemeride">Un día como hoy</span> <a href="https://youtube.com/shorts/LAEbsnER6H4" rel=noopener>YouTube</a></li></ul>
+  <p class='sub'>Piezas en proceso creadas ese día:</p><ul class='lista'><li>Elecciones en Israel 2026: Netanyahu vs Gadi Eisenkot <span class="chip chip--proceso" title="contenido/2026-10-25-elecciones-en-israel-2026-netanyahu-vs-gadi-eisenk">guion aprobado</span></li></ul>
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-24.html">sábado 24 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Haití, Fernando Muslera, Pedro Sánchez
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>Cuatro soldados salvadoreños desaparecidos en Haití <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/CQfQk6TIoYs" rel=noopener>YouTube</a></li><li>El rayo de calor en la frontera: Hegseth autoriza la prueba <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/qUHtdfI6wlc" rel=noopener>YouTube</a></li><li>Francia vuelve a la calle: qué pasa hoy <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/DudNDSDxd6I" rel=noopener>YouTube</a></li><li>Ola gigante: el periodista de ETB2 alcanzado en Ondarroa <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/i1NzxOBgMAA" rel=noopener>YouTube</a></li><li>Un día como hoy: Annie Edson Taylor baja el Niágara en barril <span class="chip chip--serie-efemeride">Un día como hoy</span> <a href="https://youtube.com/shorts/T5zto7_9KG8" rel=noopener>YouTube</a></li></ul>
+  
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-23.html">viernes 23 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: terremoto china, Shamonda, Sociedade Esportiva Palmeiras
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>Shamonda: el primer caso humano <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/EgA46pWzaRE" rel=noopener>YouTube</a></li></ul>
+  <p class='sub'>Piezas en proceso creadas ese día:</p><ul class='lista'><li>Luisa González detenida en Ecuador <span class="chip chip--proceso" title="contenido/2026-10-23-luisa-gonzalez-detenida-en-ecuador">producida</span></li><li>Terremoto en el Tíbet de magnitud 7 <span class="chip chip--proceso" title="contenido/2026-10-23-terremoto-en-el-tibet-de-magnitud-7">producida</span></li></ul>
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-22.html">jueves 22 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Javier Milei, BioWare, barranquilla - américa
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>El Niño: qué significa muy fuerte <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/RddUGxQ3eWs" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699472180467272966" rel=noopener>TikTok</a></li><li>Lula y Flávio Bolsonaro, segunda vuelta en Brasil <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/ekjuTrWEjb8" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699472536349789460" rel=noopener>TikTok</a></li><li>Meta y la multa de Nuevo México <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/mKom2WL6duQ" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699475213708283156" rel=noopener>TikTok</a></li><li>Milei apoya a María Elvira Salazar <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/xJ_M4Vh0Kt8" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699474797557927188" rel=noopener>TikTok</a></li></ul>
+  <p class='sub'>Piezas en proceso creadas ese día:</p><ul class='lista'><li>Fax: la primera transmisión con el pantelégrafo <span class="chip chip--proceso" title="contenido/2026-10-22-fax-la-primera-transmision-con-el-pantelegrafo">tema aprobado</span></li><li>Tesla y SpaceX: qué cambia si se fusionan <span class="chip chip--proceso" title="contenido/2026-10-22-tesla-y-spacex-que-cambia-si-se-fusionan">aprobada para publicar</span></li><li>Un día como hoy: Venera 9, la primera foto desde la superficie de Venus <span class="chip chip--proceso" title="contenido/2026-10-22-un-dia-como-hoy-venera-9-la-primera-foto-desde-la-">aprobada para publicar</span></li></ul>
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-21.html">miércoles 21 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Kim Jong-un, Carlos María Isidro de Borbón, Google Maps
+  <p class='sub'>Publicado ese día:</p><ul class='lista'><li>Francia: toque de queda y Trump <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/Sq8Y_vW6eeA" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699219948773788949" rel=noopener>TikTok</a></li><li>Japón va a buscar rocas a Marte <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/MZazPmEtOkE" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699471478298856725" rel=noopener>TikTok</a></li><li>Milei vs. Sánchez (y Lula) <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/Zy3FC53FLMI" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699220206618430721" rel=noopener>TikTok</a></li><li>Musk quiere fusionar SpaceX y Tesla <span class="chip chip--serie-tema">¿Por qué todos hablan?</span> <a href="https://youtube.com/shorts/jjY7nF_vwSY" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699219704816176405" rel=noopener>TikTok</a></li><li>Un día como hoy nació la fotocopia <span class="chip chip--serie-efemeride">Un día como hoy</span> <a href="https://youtube.com/shorts/Ordy5-hLNYY" rel=noopener>YouTube</a> · <a href="https://www.tiktok.com/@radarexplica/video/7699220477365062932" rel=noopener>TikTok</a></li></ul>
+  <p class='sub'>Piezas en proceso creadas ese día:</p><ul class='lista'><li>Musk quiere fusionar SpaceX y Tesla <span class="chip chip--proceso" title="contenido/2026-10-21-largo-musk-quiere-fusionar-spacex-y-tesla">propuesta</span></li></ul>
+  </div>
+</li><li class="dia">
+  <a class="dia__fecha" href="2026-10-20.html">martes 20 de octubre de 2026</a>
+  <div class="dia__cuerpo"><span class="dato">30 temas</span> · arriba: Kim Jong-un, Jair Bolsonaro, Google Maps
+  
+  <p class='sub'>Piezas en proceso creadas ese día:</p><ul class='lista'><li>Brasil vs. Meta: multa diaria <span class="chip chip--proceso" title="contenido/2026-10-20-brasil-vs-meta-multa-diaria">tema aprobado</span></li><li>Google ya predice inundaciones <span class="chip chip--proceso" title="contenido/2026-10-20-google-ya-predice-inundaciones">tema aprobado</span></li><li>Libertadores: por qué manda Brasil <span class="chip chip--proceso" title="contenido/2026-10-20-libertadores-por-que-manda-brasil">tema aprobado</span></li><li>Un día como hoy: la bombilla de Edison <span class="chip chip--proceso" title="contenido/2026-10-20-un-dia-como-hoy-la-bombilla-de-edison">tema aprobado</span></li></ul>
+  </div>
+</li></ul>
+</section>
+<footer>Radar Explica · contexto, no opinión · generado por <code>python -m radar.sitio</code> el 2026-10-30 · cada cifra lleva su archivo de origen en el tooltip o en la nota de cada pestaña</footer>
+</div>
+<script>
+(function(){
+  var botones = document.querySelectorAll('.pestanas button');
+  var paneles = document.querySelectorAll('.panel');
+  function activar(id, empujar){
+    botones.forEach(function(b){ b.setAttribute('aria-selected', b.dataset.panel === id ? 'true' : 'false'); });
+    paneles.forEach(function(p){ if (p.id === id) p.setAttribute('data-activa', ''); else p.removeAttribute('data-activa'); });
+    if (empujar && history.replaceState) history.replaceState(null, '', '#' + id);
+  }
+  botones.forEach(function(b){ b.addEventListener('click', function(){ activar(b.dataset.panel, true); window.scrollTo(0, 0); }); });
+  var h = location.hash.replace('#', '');
+  if (h && document.getElementById(h) && document.getElementById(h).classList.contains('panel')) { activar(h); setTimeout(function(){ window.scrollTo(0, 0); }, 0); }
+  else if (h && /^t\d+$/.test(h)) { activar('hoy'); var t = document.getElementById(h); if (t) t.scrollIntoView(); }
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('a[href^="#t"]'); if (!a) return; activar('hoy');
+  });
+  // Ordenar tablas: cabeceras con data-orden
+  document.querySelectorAll('.tabla th[data-orden]').forEach(function(th){
+    th.addEventListener('click', function(){
+      var tabla = th.closest('table'), tbody = tabla.querySelector('tbody'), idx = th.cellIndex, tipo = th.dataset.orden;
+      var asc = th.getAttribute('aria-sort') === 'descending';
+      tabla.querySelectorAll('th').forEach(function(o){ o.removeAttribute('aria-sort'); });
+      th.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
+      var filas = Array.prototype.slice.call(tbody.rows);
+      filas.sort(function(a, b){
+        var va, vb;
+        if (tipo === 'texto') { va = a.cells[idx].textContent.trim().toLowerCase(); vb = b.cells[idx].textContent.trim().toLowerCase(); return asc ? va.localeCompare(vb) : vb.localeCompare(va); }
+        va = tipo === 'fecha' ? a.dataset.fecha : parseFloat(a.dataset[tipo]); vb = tipo === 'fecha' ? b.dataset.fecha : parseFloat(b.dataset[tipo]);
+        if (va < vb) return asc ? -1 : 1; if (va > vb) return asc ? 1 : -1; return 0;
+      });
+      filas.forEach(function(f){ tbody.appendChild(f); });
+    });
+  });
+})();
+</script>
+</body>
+</html>
