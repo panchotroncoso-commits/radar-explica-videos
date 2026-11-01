@@ -102,7 +102,27 @@ def tablero() -> bool:
     return git("diff", "--cached", "--quiet", check=False).returncode != 0
 
 
+ESPERA_MAX = dt.timedelta(minutes=320)  # el job de Actions dura hasta 6 h: espera dentro de la misma corrida
+
+
 def main() -> int:
+    """El cron de GitHub no corre cada 15 min (1-nov-2026: 4 corridas en el día y los 4 Reels salieron juntos a las
+    12:15). Por eso cada corrida, después de publicar lo que ya venció, se queda esperando las piezas programadas
+    dentro de las próximas ~5 h y publica cada una a su hora."""
+    inicio = dt.datetime.now(dt.timezone.utc)
+    while True:
+        proxima = pasada()
+        if not proxima or proxima - inicio > ESPERA_MAX:
+            return 0
+        espera = max(0.0, (proxima - dt.datetime.now(dt.timezone.utc)).total_seconds()) + 20
+        print(f"Esperando {espera / 60:.0f} min hasta {proxima.isoformat(timespec='minutes')}", flush=True)
+        time.sleep(espera)
+        shutil.rmtree(COLA, ignore_errors=True)
+        git("pull", "-q", "--rebase", check=False)
+
+
+def pasada() -> dt.datetime | None:
+    """Publica lo que ya venció y devuelve la hora de la próxima pieza programada (o None)."""
     token, usuario = os.environ.get("INSTAGRAM_ACCESS_TOKEN"), os.environ.get("INSTAGRAM_USER_ID")
     cambio_tablero = tablero()
     if cambio_tablero:
@@ -111,13 +131,13 @@ def main() -> int:
         print("Tablero actualizado")
     if not token or not usuario:
         print("Sin INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID: nada que publicar")
-        return 0
+        return None
     hay_cola = git("clone", "-q", "--depth", "1", "-b", "ig-cola", PRIVADO, str(COLA), check=False).returncode == 0
     if not hay_cola:
         print("Sin rama ig-cola (o falta RADAR_REPO_KEY); solo la cola vieja de este repo")
     ahora = dt.datetime.now(dt.timezone.utc)
     hechas = ya_publicadas()
-    sacar, resumen = [], []
+    sacar, resumen, futuras = [], [], []
     vieja = RAIZ / "cola"  # cola anterior (hasta el 28-oct) dentro de este repo
     for info_path in sorted(list(COLA.glob("*/info.json")) + list(vieja.glob("*/info.json"))):
         item = info_path.parent
@@ -131,6 +151,7 @@ def main() -> int:
             hora = dt.datetime.fromisoformat(cuando)
             hora = hora if hora.tzinfo else hora.replace(tzinfo=CHILE)
             if hora > ahora:
+                futuras.append(hora)
                 continue
             if ahora - hora > dt.timedelta(hours=36):  # noticia vencida: no se publica
                 anotar({"slug": slug, "plataforma": "instagram", "error": "vencida (más de 36 h de atraso)",
@@ -180,7 +201,7 @@ def main() -> int:
         git("push", "-q")
     if not hay_cola:
         print(f"Listo: {', '.join(resumen) or 'nada a su hora'}")
-        return 0
+        return min(futuras, default=None)
     # la cola: sacar lo publicado y guardar los intentos fallidos
     for item in sacar:
         shutil.rmtree(item)
@@ -193,7 +214,7 @@ def main() -> int:
                 break
             git("pull", "-q", "--rebase", "origin", "ig-cola", cwd=COLA, check=False)
     print(f"Listo: {', '.join(resumen) or 'nada a su hora'}")
-    return 0
+    return min(futuras, default=None)
 
 
 if __name__ == "__main__":
