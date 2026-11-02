@@ -102,7 +102,7 @@ def tablero() -> bool:
     return git("diff", "--cached", "--quiet", check=False).returncode != 0
 
 
-ESPERA_MAX = dt.timedelta(minutes=320)  # el job de Actions dura hasta 6 h: espera dentro de la misma corrida
+ESPERA_COLA = dt.timedelta(minutes=320)  # el job de Actions dura hasta 6 h: espera dentro de la misma corrida
 
 
 def main() -> int:
@@ -112,7 +112,7 @@ def main() -> int:
     inicio = dt.datetime.now(dt.timezone.utc)
     while True:
         proxima = pasada()
-        if not proxima or proxima - inicio > ESPERA_MAX:
+        if not proxima or proxima - inicio > ESPERA_COLA:
             return 0
         espera = max(0.0, (proxima - dt.datetime.now(dt.timezone.utc)).total_seconds()) + 20
         print(f"Esperando {espera / 60:.0f} min hasta {proxima.isoformat(timespec='minutes')}", flush=True)
