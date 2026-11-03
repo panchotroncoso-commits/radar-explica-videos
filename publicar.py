@@ -114,7 +114,9 @@ def main() -> int:
         proxima = pasada()
         if not proxima or proxima - inicio > ESPERA_COLA:
             return 0
-        espera = max(0.0, (proxima - dt.datetime.now(dt.timezone.utc)).total_seconds()) + 20
+        # Despierta cada 10 min como máximo y relee la cola (3-nov-2026: una corrida dormida hasta la pieza más
+        # lejana no veía las que se encolaban después con hora más temprana, y bloqueaba a las demás 2,5 h).
+        espera = min(600.0, max(0.0, (proxima - dt.datetime.now(dt.timezone.utc)).total_seconds()) + 20)
         print(f"Esperando {espera / 60:.0f} min hasta {proxima.isoformat(timespec='minutes')}", flush=True)
         time.sleep(espera)
         shutil.rmtree(COLA, ignore_errors=True)
