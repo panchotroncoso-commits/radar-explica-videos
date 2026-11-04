@@ -200,7 +200,12 @@ def pasada() -> dt.datetime | None:
     if git("diff", "--cached", "--quiet", check=False).returncode:
         git("-c", "user.name=Radar Explica", "-c", "user.email=radarexplica@gmail.com", "commit", "-qm",
             "; ".join(resumen) or "registro")
-        git("push", "-q")
+        # 4-nov-2026: un push rechazado (el remoto avanzó) botaba la corrida antes de limpiar la cola, y lo ya
+        # publicado quedaba en ig-cola. Se reintenta con rebase, como en la cola, y nunca se cae aquí.
+        for _ in range(3):
+            if git("push", "-q", check=False).returncode == 0:
+                break
+            git("pull", "-q", "--rebase", check=False)
     if not hay_cola:
         print(f"Listo: {', '.join(resumen) or 'nada a su hora'}")
         return min(futuras, default=None)
