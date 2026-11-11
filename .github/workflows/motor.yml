@@ -1,13 +1,16 @@
-# Motor de Radar Explica: detector de olas + portadas de Shorts, cada 30 min de 06:00 a 00:00 de Chile (11-nov-2026).
+# Motor de Radar Explica: detector de olas, portadas, candidatos a rescate y panel en vivo, cada 30 min (11-nov-2026).
 # Corre en este repo público porque aquí los minutos de GitHub Actions son gratis. El código y los datos NO están aquí:
-# se bajan del repo privado con la llave de despliegue RADAR_REPO_KEY y los resultados se suben de vuelta allá.
-# Secretos de este repo: RADAR_REPO_KEY (ya existía), YOUTUBE_TOKEN_JSON, YOUTUBE_CLIENT_SECRET_JSON y PANEL_CLAVE (la
-# clave del panel en vivo docs/olas/, cifrado: sin la clave la página publicada no se puede leer).
+# se bajan del repo privado con la llave RADAR_REPO_KEY y los resultados se suben allá (automatizacion/motor_ciclo.sh).
+#
+# EN CADENA: el horario de GitHub es «lo antes posible» y con repos chicos pasa horas sin disparar (11-nov: 0 corridas
+# programadas en 3 h). Por eso cada corrida da una vuelta cada 30 min durante ~5,5 h y al final lanza la siguiente con
+# workflow_dispatch (el GITHUB_TOKEN sí puede). El horario queda solo de respaldo: si la cadena se corta, la revive.
+# Fuera de 06:00–00:00 de Chile duerme y no da vueltas.
+# Secretos: RADAR_REPO_KEY, YOUTUBE_TOKEN_JSON, YOUTUBE_CLIENT_SECRET_JSON y PANEL_CLAVE (clave del panel docs/olas/).
 name: Motor (olas y portadas)
 on:
   schedule:
-    - cron: "5,35 9-23 * * *"
-    - cron: "5,35 0-2 * * *"
+    - cron: "17 */3 * * *"
   workflow_dispatch:
     inputs:
       semanal:
@@ -15,13 +18,14 @@ on:
         default: "no"
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: motor
   cancel-in-progress: false
 jobs:
   motor:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,62 +42,45 @@ jobs:
         run: |
           git clone -q --depth 1 --filter=blob:none --sparse git@github.com:panchotroncoso-commits/radar-explica.git privado
           cd privado
-          git sparse-checkout set --no-cone /radar/ /publicacion/ /pieza.py /data/panel/ /data/olas/ /data/metricas/ \
-            /data/publicaciones.csv /data/aprendizaje/ /pieza.py '/publicadas/*/*/meta.json' '/publicadas/*/*/portada.png' \
-            '/contenido/*/meta.json' '/contenido/*/portada.png' /assets/marca/tokens.css
+          git sparse-checkout set --no-cone /radar/ /publicacion/ /pieza.py /automatizacion/motor_ciclo.sh /data/panel/ \
+            /data/olas/ /data/metricas/ /data/publicaciones.csv /data/aprendizaje/ /data/temprano/ /data/pauta/ \
+            '/publicadas/*/*/meta.json' '/publicadas/*/*/portada.png' '/contenido/*/meta.json' '/contenido/*/guion.json' \
+            '/contenido/*/portada.png' /assets/marca/tokens.css
+          git config user.name "Radar Explica (motor)"
+          git config user.email "radarexplica@gmail.com"
+          cd ../publico
+          git config user.name "Radar Explica (motor)"
+          git config user.email "radarexplica@gmail.com"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install -q requests pillow python-dotenv google-api-python-client google-auth-oauthlib google-auth-httplib2 cryptography
-      - name: Portadas
+      - name: Vueltas cada 30 min
         working-directory: privado
         env:
           YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
           YOUTUBE_CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}
-        run: |
-          python -m publicacion.miniaturas --dias 1 || true
-          mkdir -p data/olas
-          python -m publicacion.rescate candidatos > data/olas/rescate.json || echo "[]" > data/olas/rescate.json
-          echo "Candidatos a rescate: $(python -c "import json; print(len(json.load(open('data/olas/rescate.json'))))")"
-      - name: Detector
-        working-directory: privado
-        env:
-          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
-          YOUTUBE_CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}
-          TZ: America/Santiago
-        run: |
-          python -m radar.fuentes.sobrerendimiento --json --top 15 > /dev/null
-          python -c "import json; r=json.load(open('data/olas/detector.json')); print('Panel', r['canales_leidos'], '/', r['canales_panel'], '· alertas:', len(r.get('alertas_ola', [])))"
-      - name: Aprendizaje semanal (lunes, primera corrida)
-        working-directory: privado
-        env:
-          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
-          YOUTUBE_CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}
-          TZ: America/Santiago
-        run: |
-          if [ "$(date -u +%u%H)" != "109" ] && [ "${{ github.event_name }}" != "workflow_dispatch" -o "${{ github.event.inputs.semanal }}" != "si" ]; then exit 0; fi
-          python -m radar.modelo || true
-          python -m radar.calibrar --grilla | tail -3 || true
-      - name: Sube resultados al repo privado
-        working-directory: privado
-        run: |
-          git config user.name "Radar Explica (motor)"
-          git config user.email "radarexplica@gmail.com"
-          git add data/panel/mediciones data/panel/base.json data/panel/cobertura.json data/olas/detector.json data/olas/historial.jsonl data/olas/rescate.json
-          git add data/aprendizaje/modelo.json data/aprendizaje/modelo-datos.jsonl data/aprendizaje/calibracion.json 2>/dev/null || true
-          git commit -qm "Motor $(date +%FT%H:%M)" || exit 0
-          for i in 1 2 3 4; do git pull -q --rebase && git push -q && exit 0; sleep 7; done
-          exit 1
-      - name: Panel en vivo (cifrado)
-        working-directory: privado
-        env:
           PANEL_CLAVE: ${{ secrets.PANEL_CLAVE }}
+          SEMANAL: ${{ github.event.inputs.semanal }}
+          TZ: America/Santiago
         run: |
-          if [ -z "$PANEL_CLAVE" ]; then echo "::warning::Falta el secreto PANEL_CLAVE"; exit 0; fi
-          python -m radar.panel_web ../publico/docs/olas/index.html
-          cd ../publico
-          git config user.name "Radar Explica (motor)"
-          git config user.email "radarexplica@gmail.com"
-          git add docs/olas/index.html
-          git commit -qm "Panel en vivo" || exit 0
-          for i in 1 2 3 4; do git pull -q --rebase && git push -q && exit 0; sleep 7; done
+          fin=$(( $(date +%s) + 330*60 ))
+          while [ "$(date +%s)" -lt "$fin" ]; do
+            h=$(date +%H)
+            if [ "$h" -ge 6 ]; then
+              echo "::group::Vuelta $(date '+%F %H:%M')"
+              bash automatizacion/motor_ciclo.sh ../publico || true
+              echo "::endgroup::"
+              SEMANAL=no
+            else
+              echo "$(date '+%H:%M') fuera de horario (00–06 Chile): duerme"
+            fi
+            prox=$(( ( $(date +%s) / 1800 + 1 ) * 1800 + 300 ))   # próximo :05 o :35
+            [ "$prox" -ge "$fin" ] && break
+            sleep $(( prox - $(date +%s) ))
+          done
+      - name: Lanza la siguiente vuelta de la cadena
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run motor.yml -R "${{ github.repository }}" -f semanal=no
