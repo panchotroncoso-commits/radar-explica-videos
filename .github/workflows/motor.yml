@@ -9,6 +9,10 @@ on:
     - cron: "5,35 9-23 * * *"
     - cron: "5,35 0-2 * * *"
   workflow_dispatch:
+    inputs:
+      semanal:
+        description: "Correr también el aprendizaje semanal (modelo y calibración): si / no"
+        default: "no"
 permissions:
   contents: write
 concurrency:
@@ -17,7 +21,7 @@ concurrency:
 jobs:
   motor:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,7 +39,7 @@ jobs:
           git clone -q --depth 1 --filter=blob:none --sparse git@github.com:panchotroncoso-commits/radar-explica.git privado
           cd privado
           git sparse-checkout set --no-cone /radar/ /publicacion/ /pieza.py /data/panel/ /data/olas/ /data/metricas/ \
-            /data/publicaciones.csv '/publicadas/*/*/meta.json' '/publicadas/*/*/portada.png' \
+            /data/publicaciones.csv /data/aprendizaje/ /pieza.py '/publicadas/*/*/meta.json' '/publicadas/*/*/portada.png' \
             '/contenido/*/meta.json' '/contenido/*/portada.png' /assets/marca/tokens.css
       - uses: actions/setup-python@v5
         with:
@@ -46,7 +50,11 @@ jobs:
         env:
           YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
           YOUTUBE_CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}
-        run: python -m publicacion.miniaturas --dias 1 || true
+        run: |
+          python -m publicacion.miniaturas --dias 1 || true
+          mkdir -p data/olas
+          python -m publicacion.rescate candidatos > data/olas/rescate.json || echo "[]" > data/olas/rescate.json
+          echo "Candidatos a rescate: $(python -c "import json; print(len(json.load(open('data/olas/rescate.json'))))")"
       - name: Detector
         working-directory: privado
         env:
@@ -56,12 +64,23 @@ jobs:
         run: |
           python -m radar.fuentes.sobrerendimiento --json --top 15 > /dev/null
           python -c "import json; r=json.load(open('data/olas/detector.json')); print('Panel', r['canales_leidos'], '/', r['canales_panel'], '· alertas:', len(r.get('alertas_ola', [])))"
+      - name: Aprendizaje semanal (lunes, primera corrida)
+        working-directory: privado
+        env:
+          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+          YOUTUBE_CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}
+          TZ: America/Santiago
+        run: |
+          if [ "$(date -u +%u%H)" != "109" ] && [ "${{ github.event_name }}" != "workflow_dispatch" -o "${{ github.event.inputs.semanal }}" != "si" ]; then exit 0; fi
+          python -m radar.modelo || true
+          python -m radar.calibrar --grilla | tail -3 || true
       - name: Sube resultados al repo privado
         working-directory: privado
         run: |
           git config user.name "Radar Explica (motor)"
           git config user.email "radarexplica@gmail.com"
-          git add data/panel/mediciones data/panel/base.json data/panel/cobertura.json data/olas/detector.json data/olas/historial.jsonl
+          git add data/panel/mediciones data/panel/base.json data/panel/cobertura.json data/olas/detector.json data/olas/historial.jsonl data/olas/rescate.json
+          git add data/aprendizaje/modelo.json data/aprendizaje/modelo-datos.jsonl data/aprendizaje/calibracion.json 2>/dev/null || true
           git commit -qm "Motor $(date +%FT%H:%M)" || exit 0
           for i in 1 2 3 4; do git pull -q --rebase && git push -q && exit 0; sleep 7; done
           exit 1
