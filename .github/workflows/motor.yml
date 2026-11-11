@@ -1,0 +1,61 @@
+# Motor de Radar Explica: detector de olas + portadas de Shorts, cada 30 min de 06:00 a 00:00 de Chile (11-nov-2026).
+# Corre en este repo público porque aquí los minutos de GitHub Actions son gratis. El código y los datos NO están aquí:
+# se bajan del repo privado con la llave de despliegue RADAR_REPO_KEY y los resultados se suben de vuelta allá.
+# Secretos de este repo: RADAR_REPO_KEY (ya existía), YOUTUBE_TOKEN_JSON y YOUTUBE_CLIENT_SECRET_JSON.
+name: Motor (olas y portadas)
+on:
+  schedule:
+    - cron: "5,35 9-23 * * *"
+    - cron: "5,35 0-2 * * *"
+  workflow_dispatch:
+concurrency:
+  group: motor
+  cancel-in-progress: false
+jobs:
+  motor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Llave del repo privado
+        env:
+          RADAR_REPO_KEY: ${{ secrets.RADAR_REPO_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$RADAR_REPO_KEY" | sed 's/\\n/\n/g' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+      - name: Baja solo lo que usa el motor
+        run: |
+          git clone -q --depth 1 --filter=blob:none --sparse git@github.com:panchotroncoso-commits/radar-explica.git privado
+          cd privado
+          git sparse-checkout set --no-cone /radar/ /publicacion/ /pieza.py /data/panel/ /data/olas/ /data/metricas/ \
+            /data/publicaciones.csv '/publicadas/*/*/meta.json' '/publicadas/*/*/portada.png' \
+            '/contenido/*/meta.json' '/contenido/*/portada.png'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q requests pillow python-dotenv google-api-python-client google-auth-oauthlib google-auth-httplib2
+      - name: Portadas
+        working-directory: privado
+        env:
+          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+          YOUTUBE_CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}
+        run: python -m publicacion.miniaturas --dias 1 || true
+      - name: Detector
+        working-directory: privado
+        env:
+          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+          YOUTUBE_CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}
+          TZ: America/Santiago
+        run: |
+          python -m radar.fuentes.sobrerendimiento --json --top 15 > /dev/null
+          python -c "import json; r=json.load(open('data/olas/detector.json')); print('Panel', r['canales_leidos'], '/', r['canales_panel'], '· alertas:', len(r.get('alertas_ola', [])))"
+      - name: Sube resultados al repo privado
+        working-directory: privado
+        run: |
+          git config user.name "Radar Explica (motor)"
+          git config user.email "radarexplica@gmail.com"
+          git add data/panel/mediciones data/panel/base.json data/panel/cobertura.json data/olas/detector.json
+          git commit -qm "Motor $(date +%FT%H:%M)" || exit 0
+          for i in 1 2 3 4; do git pull -q --rebase && git push -q && exit 0; sleep 7; done
+          exit 1
