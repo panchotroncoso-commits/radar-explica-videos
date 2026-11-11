@@ -2,15 +2,15 @@
 # Corre en este repo público porque aquí los minutos de GitHub Actions son gratis. El código y los datos NO están aquí:
 # se bajan del repo privado con la llave RADAR_REPO_KEY y los resultados se suben allá (automatizacion/motor_ciclo.sh).
 #
-# EN CADENA: el horario de GitHub es «lo antes posible» y con repos chicos pasa horas sin disparar (11-nov: 0 corridas
-# programadas en 3 h). Por eso cada corrida da una vuelta cada 30 min durante ~5,5 h y al final lanza la siguiente con
-# workflow_dispatch (el GITHUB_TOKEN sí puede). El horario queda solo de respaldo: si la cadena se corta, la revive.
-# Fuera de 06:00–00:00 de Chile duerme y no da vueltas.
+# LO LANZA cron-job.org (Pancho, 11-nov-2026): el horario de GitHub es «lo antes posible» y con repos chicos pasa horas sin
+# disparar (11-nov: 0 corridas programadas en 3 h). cron-job.org llama a la API (workflow_dispatch) a los :05 y :35, de
+# 06:00 a 23:35 de Chile, con un token fino que solo puede lanzar Actions de este repo. Cada lanzamiento = una vuelta.
+# El horario de abajo es solo respaldo por si cron-job.org falla.
 # Secretos: RADAR_REPO_KEY, YOUTUBE_TOKEN_JSON, YOUTUBE_CLIENT_SECRET_JSON y PANEL_CLAVE (clave del panel docs/olas/).
 name: Motor (olas y portadas)
 on:
   schedule:
-    - cron: "17 */3 * * *"
+    - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
       semanal:
@@ -18,14 +18,13 @@ on:
         default: "no"
 permissions:
   contents: write
-  actions: write
 concurrency:
   group: motor
   cancel-in-progress: false
 jobs:
   motor:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,7 +54,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -q requests pillow python-dotenv google-api-python-client google-auth-oauthlib google-auth-httplib2 cryptography
-      - name: Vueltas cada 30 min
+      - name: Una vuelta
         working-directory: privado
         env:
           YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
@@ -64,23 +63,5 @@ jobs:
           SEMANAL: ${{ github.event.inputs.semanal }}
           TZ: America/Santiago
         run: |
-          fin=$(( $(date +%s) + 330*60 ))
-          while [ "$(date +%s)" -lt "$fin" ]; do
-            h=$(date +%H)
-            if [ "$h" -ge 6 ]; then
-              echo "::group::Vuelta $(date '+%F %H:%M')"
-              bash automatizacion/motor_ciclo.sh ../publico || true
-              echo "::endgroup::"
-              SEMANAL=no
-            else
-              echo "$(date '+%H:%M') fuera de horario (00–06 Chile): duerme"
-            fi
-            prox=$(( ( $(date +%s) / 1800 + 1 ) * 1800 + 300 ))   # próximo :05 o :35
-            [ "$prox" -ge "$fin" ] && break
-            sleep $(( prox - $(date +%s) ))
-          done
-      - name: Lanza la siguiente vuelta de la cadena
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run motor.yml -R "${{ github.repository }}" -f semanal=no
+          if [ "$(date +%H)" -lt 6 ]; then echo "fuera de horario (00–06 Chile)"; exit 0; fi
+          bash automatizacion/motor_ciclo.sh ../publico
