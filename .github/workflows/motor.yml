@@ -1,13 +1,16 @@
 # Motor de Radar Explica: detector de olas + portadas de Shorts, cada 30 min de 06:00 a 00:00 de Chile (11-nov-2026).
 # Corre en este repo público porque aquí los minutos de GitHub Actions son gratis. El código y los datos NO están aquí:
 # se bajan del repo privado con la llave de despliegue RADAR_REPO_KEY y los resultados se suben de vuelta allá.
-# Secretos de este repo: RADAR_REPO_KEY (ya existía), YOUTUBE_TOKEN_JSON y YOUTUBE_CLIENT_SECRET_JSON.
+# Secretos de este repo: RADAR_REPO_KEY (ya existía), YOUTUBE_TOKEN_JSON, YOUTUBE_CLIENT_SECRET_JSON y PANEL_CLAVE (la
+# clave del panel en vivo docs/olas/, cifrado: sin la clave la página publicada no se puede leer).
 name: Motor (olas y portadas)
 on:
   schedule:
     - cron: "5,35 9-23 * * *"
     - cron: "5,35 0-2 * * *"
   workflow_dispatch:
+permissions:
+  contents: write
 concurrency:
   group: motor
   cancel-in-progress: false
@@ -16,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v4
+        with:
+          path: publico
       - name: Llave del repo privado
         env:
           RADAR_REPO_KEY: ${{ secrets.RADAR_REPO_KEY }}
@@ -30,11 +36,11 @@ jobs:
           cd privado
           git sparse-checkout set --no-cone /radar/ /publicacion/ /pieza.py /data/panel/ /data/olas/ /data/metricas/ \
             /data/publicaciones.csv '/publicadas/*/*/meta.json' '/publicadas/*/*/portada.png' \
-            '/contenido/*/meta.json' '/contenido/*/portada.png'
+            '/contenido/*/meta.json' '/contenido/*/portada.png' /assets/marca/tokens.css
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -q requests pillow python-dotenv google-api-python-client google-auth-oauthlib google-auth-httplib2
+      - run: pip install -q requests pillow python-dotenv google-api-python-client google-auth-oauthlib google-auth-httplib2 cryptography
       - name: Portadas
         working-directory: privado
         env:
@@ -55,7 +61,20 @@ jobs:
         run: |
           git config user.name "Radar Explica (motor)"
           git config user.email "radarexplica@gmail.com"
-          git add data/panel/mediciones data/panel/base.json data/panel/cobertura.json data/olas/detector.json
+          git add data/panel/mediciones data/panel/base.json data/panel/cobertura.json data/olas/detector.json data/olas/historial.jsonl
           git commit -qm "Motor $(date +%FT%H:%M)" || exit 0
           for i in 1 2 3 4; do git pull -q --rebase && git push -q && exit 0; sleep 7; done
           exit 1
+      - name: Panel en vivo (cifrado)
+        working-directory: privado
+        env:
+          PANEL_CLAVE: ${{ secrets.PANEL_CLAVE }}
+        run: |
+          if [ -z "$PANEL_CLAVE" ]; then echo "::warning::Falta el secreto PANEL_CLAVE"; exit 0; fi
+          python -m radar.panel_web ../publico/docs/olas/index.html
+          cd ../publico
+          git config user.name "Radar Explica (motor)"
+          git config user.email "radarexplica@gmail.com"
+          git add docs/olas/index.html
+          git commit -qm "Panel en vivo" || exit 0
+          for i in 1 2 3 4; do git pull -q --rebase && git push -q && exit 0; sleep 7; done
