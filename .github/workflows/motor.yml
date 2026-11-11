@@ -43,7 +43,7 @@ jobs:
           git clone -q --depth 1 --filter=blob:none --sparse git@github.com:panchotroncoso-commits/radar-explica.git privado
           cd privado
           git sparse-checkout set --no-cone /radar/ /publicacion/ /pieza.py /automatizacion/motor_ciclo.sh /data/panel/ \
-            /data/olas/ /data/metricas/ /data/publicaciones.csv /data/aprendizaje/ /data/temprano/ /data/pauta/ \
+            /data/olas/ /data/metricas/ /data/publicaciones.csv /data/aprendizaje/ /data/temprano/ /data/pauta/ /data/retro/ \
             '/publicadas/*/*/meta.json' '/publicadas/*/*/portada.png' '/contenido/*/meta.json' '/contenido/*/guion.json' \
             '/contenido/*/portada.png' /assets/marca/tokens.css
           git config user.name "Radar Explica (motor)"
