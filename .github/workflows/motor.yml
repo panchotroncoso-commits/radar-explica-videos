@@ -11,6 +11,8 @@ name: Motor (olas y portadas)
 on:
   schedule:
     - cron: "17 */3 * * *"
+  push:                      # al cambiar este archivo arranca la cadena de inmediato
+    paths: [".github/workflows/motor.yml"]
   workflow_dispatch:
     inputs:
       semanal:
@@ -64,12 +66,12 @@ jobs:
           SEMANAL: ${{ github.event.inputs.semanal }}
           TZ: America/Santiago
         run: |
-          fin=$(( $(date +%s) + 330*60 ))
+          fin=$(( $(date +%s) + 300*60 ))   # 300 min: deja margen para lanzar la siguiente antes del límite de 350
           while [ "$(date +%s)" -lt "$fin" ]; do
             h=$(date +%H)
             if [ "$h" -ge 6 ]; then
               echo "::group::Vuelta $(date '+%F %H:%M')"
-              bash automatizacion/motor_ciclo.sh ../publico || true
+              timeout 25m bash automatizacion/motor_ciclo.sh ../publico || echo "vuelta cortada o con error ($?)"   # una vuelta colgada no mata la cadena (11-nov: 19:35)
               echo "::endgroup::"
               SEMANAL=no
             else
