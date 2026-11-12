@@ -47,7 +47,8 @@ jobs:
           git sparse-checkout set --no-cone /radar/ /publicacion/ /pieza.py /automatizacion/motor_ciclo.sh /data/panel/ \
             /data/olas/ /data/metricas/ /data/publicaciones.csv /data/aprendizaje/ /data/temprano/ /data/pauta/ /data/retro/ \
             '/publicadas/*/*/meta.json' '/publicadas/*/*/portada.png' '/contenido/*/meta.json' '/contenido/*/guion.json' \
-            '/contenido/*/portada.png' /assets/marca/tokens.css
+            '/contenido/*/portada.png' '/contenido/*/empaque_b.json' '/contenido/*/portada-b*.png' \
+            '/publicadas/*/*/empaque_b.json' '/publicadas/*/*/portada-b*.png' /assets/marca/tokens.css
           git config user.name "Radar Explica (motor)"
           git config user.email "radarexplica@gmail.com"
           cd ../publico
